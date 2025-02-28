@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
-import 'loginPage.dart';
+import 'login/login.page.dart';
+import 'login/startpage.dart';
+import 'login/signup.page.dart';
+import 'login/reset-password.page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +17,15 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
-      home: LoginPage(),
+      routes: {
+        '/start': (context) => StartPage(), // Página inicial
+        '/login': (context) => LoginPage(), // Página de login
+        '/cadastro': (context) => SignupPage(), // Página de cadastro
+        '/reset-password': (context) => ResetPasswordPage(), // Página de redefinição de senha
+
+      },
+      home: StartPage(),
+
     );
   }
 }
