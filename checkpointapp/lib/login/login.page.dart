@@ -6,19 +6,36 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      // App bar (voltar) ___________________________________________________________________________________________________________
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        automaticallyImplyLeading: true,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back),
+          color: Colors.black38,
+          onPressed: () => Navigator.pushNamed(context, '/start'),
+        ),
+      ),
+
       body: Container(
         padding: EdgeInsets.only(top: 60, left: 40, right: 40),
         color: Colors.white,
+
         child: ListView(
           children: <Widget>[
+            // Logo _________________________________________________________________________________________________________________
             SizedBox(
-              width: 128,
-              height: 128,
+              width: 100,
+              height: 100,
               child: Image.asset("assets/CheckPoint.png"),
             ),
+
             SizedBox(
               height: 20,
             ),
+
+            // Input email __________________________________________________________________________________________________________
             TextFormField(
               // autofocus: true,
               keyboardType: TextInputType.emailAddress,
@@ -32,9 +49,12 @@ class LoginPage extends StatelessWidget {
               ),
               style: TextStyle(fontSize: 20),
             ),
+
             SizedBox(
               height: 10,
             ),
+
+            // Input senha __________________________________________________________________________________________________________
             TextFormField(
               // autofocus: true,
               keyboardType: TextInputType.text,
@@ -49,9 +69,12 @@ class LoginPage extends StatelessWidget {
               ),
               style: TextStyle(fontSize: 20),
             ),
+
             Container(
               height: 40,
               alignment: Alignment.centerRight,
+
+              // Botão recuperar senha ______________________________________________________________________________________________
               child: TextButton(
                 child: Text(
                   "Recuperar Senha",
@@ -67,9 +90,12 @@ class LoginPage extends StatelessWidget {
                 },
               ),
             ),
+
             SizedBox(
               height: 40,
             ),
+
+            // Botão login __________________________________________________________________________________________________________
             Container(
               height: 60,
               alignment: Alignment.centerLeft,
@@ -78,10 +104,7 @@ class LoginPage extends StatelessWidget {
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                   stops: [0.3, 1],
-                  colors: [
-                    Color(0xFFF58524),
-                    Color(0XFFF92B7F),
-                  ],
+                  colors: [Color(0xFFF58524),Color(0XFFF92B7F),],
                 ),
                 borderRadius: BorderRadius.all(
                   Radius.circular(5),
@@ -121,9 +144,12 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
             ),
+
             SizedBox(
               height: 10,
             ),
+
+            // Botão login com facebook ____________________________________________________________________________________________
             Container(
               height: 60,
               alignment: Alignment.centerLeft,
@@ -160,9 +186,12 @@ class LoginPage extends StatelessWidget {
                 ),
               ),
             ),
+
             SizedBox(
               height: 10,
             ),
+
+            // Botão cadastrar _____________________________________________________________________________________________________
             Container(
               height: 40,
               child: TextButton(

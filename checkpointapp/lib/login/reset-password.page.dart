@@ -4,6 +4,8 @@ class ResetPasswordPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+
+      // APP BAR (voltar) ___________________________________________________________________________________________________________
       appBar: AppBar(
         backgroundColor: Colors.white,
         automaticallyImplyLeading: true,
@@ -13,6 +15,8 @@ class ResetPasswordPage extends StatelessWidget {
           onPressed: () => Navigator.pop(context, false),
         ),
       ),
+
+      // Conteudo ___________________________________________________________________________________________________________________
       body: Container(
         padding: EdgeInsets.only(top: 60, left: 40, right: 40),
         color: Colors.white,
@@ -21,6 +25,8 @@ class ResetPasswordPage extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
+
+                // Informacoes de reset de senha ___________________________________________________________________________________
                 Container(
                   child: Column(
                     children: <Widget>[
@@ -53,6 +59,8 @@ class ResetPasswordPage extends StatelessWidget {
                     ],
                   ),
                 ),
+
+                // Input email ______________________________________________________________________________________________________
                 Container(
                   width: double.infinity,
                   child: Column(

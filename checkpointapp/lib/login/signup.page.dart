@@ -4,159 +4,179 @@ class SignupPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        padding: EdgeInsets.only(top: 10, left: 40, right: 40),
-        color: Colors.white,
-        child: ListView(
-          children: <Widget>[
-            Container(
-              width: 200,
-              height: 200,
-              alignment: Alignment(0.0, 1.15),
-              decoration: new BoxDecoration(
-                image: new DecorationImage(
-                  image: AssetImage("assets/profile-picture.png"),
-                  fit: BoxFit.fitHeight,
+      body: Center(
+        child: Container(
+          padding: EdgeInsets.only(top: 10, left: 40, right: 40),
+          color: Colors.white,
+          child: ListView(
+            children: <Widget>[
+
+              // Foto de perfil ______________________________________________________________________________________________________
+              Container(
+                width: 150,
+                height: 150,
+                alignment: Alignment(0.0, 1.15),
+                decoration: new BoxDecoration(
+                  image: new DecorationImage(
+                    image: AssetImage("assets/profile-picture2.png"),
+                    fit: BoxFit.fitHeight,
+                  ),
+                ),
+                child: Container(
+                  height: 56,
+                  width: 56,
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      stops: [0.3, 1.0],
+                      colors: [
+                        Color(0xFFF58524),
+                        Color(0XFFF92B7F),
+                      ],
+                    ),
+                    border: Border.all(
+                      width: 4.0,
+                      color: const Color(0xFFFFFFFF),
+                    ),
+                    borderRadius: BorderRadius.all(
+                      Radius.circular(56),
+                    ),
+                  ),
+                  child: SizedBox.expand(
+                    child: TextButton(
+                      child: Icon(
+                        Icons.add,
+                        color: Colors.white,
+                      ),
+                      onPressed: () {},
+                    ),
+                  ),
                 ),
               ),
-              child: Container(
-                height: 56,
-                width: 56,
-                alignment: Alignment.center,
+
+              SizedBox(
+                height: 20,
+              ),
+
+              // Cadastro __________________________________________________________________________________________________________
+              // Input nome __________________________________________________________________________________________________________
+              TextFormField(
+                // autofocus: true,
+                keyboardType: TextInputType.text,
+                decoration: InputDecoration(
+                  labelText: "Nome",
+                  labelStyle: TextStyle(
+                    color: Colors.black38,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 20,
+                  ),
+                ),
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+
+              SizedBox(
+                height: 10,
+              ),
+
+              // Input email __________________________________________________________________________________________________________
+              TextFormField(
+                // autofocus: true,
+                keyboardType: TextInputType.emailAddress,
+                decoration: InputDecoration(
+                  labelText: "E-mail",
+                  labelStyle: TextStyle(
+                    color: Colors.black38,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 20,
+                  ),
+                ),
+                style: TextStyle(
+                  fontSize: 20,
+                ),
+              ),
+
+              SizedBox(
+                height: 10,
+              ),
+
+              // Input senha __________________________________________________________________________________________________________
+              TextFormField(
+                // autofocus: true,
+                keyboardType: TextInputType.text,
+                obscureText: true,
+                decoration: InputDecoration(
+                  labelText: "Senha",
+                  labelStyle: TextStyle(
+                    color: Colors.black38,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 20,
+                  ),
+                ),
+                style: TextStyle(fontSize: 20),
+              ),
+
+              SizedBox(
+                height: 10,
+              ),
+
+              // Botão cadastrar ____________________________________________________________________________________________________
+              Container(
+                height: 60,
+                alignment: Alignment.centerLeft,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
-                    stops: [0.3, 1.0],
+                    stops: [0.3, 1],
                     colors: [
                       Color(0xFFF58524),
                       Color(0XFFF92B7F),
                     ],
                   ),
-                  border: Border.all(
-                    width: 4.0,
-                    color: const Color(0xFFFFFFFF),
-                  ),
                   borderRadius: BorderRadius.all(
-                    Radius.circular(56),
+                    Radius.circular(5),
                   ),
                 ),
                 child: SizedBox.expand(
                   child: TextButton(
-                    child: Icon(
-                      Icons.add,
-                      color: Colors.white,
+                    child: Text(
+                      "Cadastrar",
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                      textAlign: TextAlign.center,
                     ),
                     onPressed: () {},
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            TextFormField(
-              // autofocus: true,
-              keyboardType: TextInputType.text,
-              decoration: InputDecoration(
-                labelText: "Nome",
-                labelStyle: TextStyle(
-                  color: Colors.black38,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20,
-                ),
+
+              SizedBox(
+                height: 10,
               ),
-              style: TextStyle(
-                fontSize: 20,
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TextFormField(
-              // autofocus: true,
-              keyboardType: TextInputType.emailAddress,
-              decoration: InputDecoration(
-                labelText: "E-mail",
-                labelStyle: TextStyle(
-                  color: Colors.black38,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20,
-                ),
-              ),
-              style: TextStyle(
-                fontSize: 20,
-              ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            TextFormField(
-              // autofocus: true,
-              keyboardType: TextInputType.text,
-              obscureText: true,
-              decoration: InputDecoration(
-                labelText: "Senha",
-                labelStyle: TextStyle(
-                  color: Colors.black38,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 20,
-                ),
-              ),
-              style: TextStyle(fontSize: 20),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              height: 60,
-              alignment: Alignment.centerLeft,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  stops: [0.3, 1],
-                  colors: [
-                    Color(0xFFF58524),
-                    Color(0XFFF92B7F),
-                  ],
-                ),
-                borderRadius: BorderRadius.all(
-                  Radius.circular(5),
-                ),
-              ),
-              child: SizedBox.expand(
+
+              // Botão cancelar _____________________________________________________________________________________________________
+              Container(
+                height: 40,
+                alignment: Alignment.center,
                 child: TextButton(
                   child: Text(
-                    "Cadastrar",
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      fontSize: 20,
-                    ),
+                    "Cancelar",
                     textAlign: TextAlign.center,
                   ),
-                  onPressed: () {},
+                  onPressed: () => Navigator.pop(context, false),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 10,
-            ),
-            Container(
-              height: 40,
-              alignment: Alignment.center,
-              child: TextButton(
-                child: Text(
-                  "Cancelar",
-                  textAlign: TextAlign.center,
-                ),
-                onPressed: () => Navigator.pop(context, false),
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
+      )
     );
   }
 }
