@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'login/login.page.dart';
-import 'login/startpage.dart';
-import 'login/signup.page.dart';
-import 'login/reset-password.page.dart';
+import '../login/login.page.dart';
+import '../login/startpage.dart';
+import '../login/signup.page.dart';
+import '../login/reset-password.page.dart';
+import 'TelaPerfil.dart';
 
 void main() {
   runApp(const MyApp());
@@ -24,7 +25,7 @@ class MyApp extends StatelessWidget {
         '/reset-password': (context) => ResetPasswordPage(), // Página de redefinição de senha
 
       },
-      home: StartPage(),
+      home: ProfileScreen(),
 
     );
   }
