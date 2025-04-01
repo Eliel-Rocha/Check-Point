@@ -3,6 +3,7 @@ import 'login/login.page.dart';
 import 'login/startpage.dart';
 import 'login/signup.page.dart';
 import 'login/reset-password.page.dart';
+import 'timeline/timeline.dart';
 
 void main() {
   runApp(const MyApp());
@@ -22,7 +23,7 @@ class MyApp extends StatelessWidget {
         '/login': (context) => LoginPage(), // Página de login
         '/cadastro': (context) => SignupPage(), // Página de cadastro
         '/reset-password': (context) => ResetPasswordPage(), // Página de redefinição de senha
-
+        '/timeline': (context) => TimelineScreen(),
       },
       home: StartPage(),
 

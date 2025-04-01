@@ -133,13 +133,8 @@ class LoginPage extends StatelessWidget {
                       )
                     ],
                   ),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => LoginPage(),
-                      ),
-                    );
+                  onPressed: ()  {
+                    Navigator.pushNamed(context, '/timeline');
                   },
                 ),
               ),
