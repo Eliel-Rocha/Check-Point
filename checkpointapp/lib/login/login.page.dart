@@ -134,7 +134,7 @@ class LoginPage extends StatelessWidget {
                     ],
                   ),
                   onPressed: ()  {
-                    Navigator.pushNamed(context, '/timeline');
+                    Navigator.pushNamed(context, '/tela_principal');
                   },
                 ),
               ),

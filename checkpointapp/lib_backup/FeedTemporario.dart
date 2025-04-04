@@ -1,7 +1,8 @@
+import 'package:checkpointapp/root.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'BarraNavegacao.dart';
-import 'TelaPerfil.dart';
+import '../lib/Profile/TelaPerfil.dart';
 
 
 
@@ -26,7 +27,7 @@ class _FeedScreenState extends State<FeedScreen> {
       case 1:
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => ProfileScreen()),
+          MaterialPageRoute(builder: (context) => RootPage()),
         );
         break;
       case 2:
@@ -56,7 +57,7 @@ class _FeedScreenState extends State<FeedScreen> {
       body: Center(
         child: Text(
           'Conteúdo do Feed',
-        ), // Substitua isso pelo conteúdo real do feed
+        ),
       ),
       bottomNavigationBar: BottomNavBar(
         selectedIndex: _selectedIndex,

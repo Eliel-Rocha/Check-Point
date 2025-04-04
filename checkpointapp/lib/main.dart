@@ -1,3 +1,4 @@
+import 'package:checkpointapp/root.dart';
 import 'package:flutter/material.dart';
 import 'login/login.page.dart';
 import 'login/startpage.dart';
@@ -18,12 +19,14 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+      debugShowCheckedModeBanner: false, // <-- remove o banner
       routes: {
         '/start': (context) => StartPage(), // Página inicial
         '/login': (context) => LoginPage(), // Página de login
         '/cadastro': (context) => SignupPage(), // Página de cadastro
         '/reset-password': (context) => ResetPasswordPage(), // Página de redefinição de senha
-        '/timeline': (context) => TimelineScreen(),
+        '/timeline': (context) => RootPage(),
+        '/tela_principal': (context) => RootPage(),
       },
       home: StartPage(),
 

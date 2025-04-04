@@ -1,8 +1,7 @@
 import 'dart:io';
+import 'package:checkpointapp/timeline/timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'BarraNavegacao.dart';
-import 'FeedTemporario.dart';
 import 'ConfiguracoesPerfil.dart';
 import 'Conquistas.dart';
 import 'GradeDeFotos.dart';
@@ -10,11 +9,24 @@ import 'GradeDeFotos.dart';
 
 
 class ProfileScreen extends StatefulWidget {
+  final String name;
+  final String? imagePath;
+  final String bio;
+
+  ProfileScreen({
+    Key? key,
+    required this.name,
+    this.imagePath,
+    required this.bio,
+  }) : super(key: key);
+
+
+
   @override
-  _ProfileScreenState createState() => _ProfileScreenState();
+  ProfileScreenState createState() => ProfileScreenState();
 }
 
-class _ProfileScreenState extends State<ProfileScreen> {
+class ProfileScreenState extends State<ProfileScreen> {
   static const Color sunsetOrange = Color(0xFFFF9933);
   static const Color sunsetPurple = Color(0xFF663399);
   static const Color sunsetYellow = Color(0xFFFFCC33);
@@ -27,8 +39,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String _profileBio = "";
   List<String> _photoPaths = [];
   List<bool> _likes = [];
-  int _selectedIndex = 1;
   final ImagePicker _picker = ImagePicker();
+
+  void updateProfile(String name, String? imagePath, String bio) {
+    setState(() {
+      _profileName = name;
+      _profileImagePath = imagePath;
+      _profileBio = bio;
+    });
+  }
+
 
   void _updateProfileName(String newName) {
     setState(() {
@@ -68,26 +88,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    switch (index) {
-      case 0:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => FeedScreen()),
-        );
-        break;
-      case 1:
-        break;
-      case 2:
-        break;
-      case 3:
-        break;
-    }
-  }
 
   Future<void> _showImageSourceDialog() async {
     await showDialog(
@@ -176,66 +176,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       },
       child: Scaffold(
         backgroundColor: Colors.white,
-        appBar: AppBar(
-          flexibleSpace: Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [sunsetOrange, sunsetPurple],
-              ),
-            ),
-          ),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back_rounded, color: Colors.white, size: 30),
-            onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => FeedScreen()),
-              );
-            },
-          ),
-          title: Align(
-            alignment: AlignmentDirectional(-1, 0),
-            child: Text(
-              'Profile',
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: 'Inter Tight',
-                color: Colors.white,
-                fontSize: 20,
-                letterSpacing: 0.0,
-              ),
-            ),
-          ),
-          centerTitle: true,
-          elevation: 2,
-          actions: [
-            IconButton(
-              icon: Icon(Icons.settings, color: Colors.white),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder:
-                        (context) => SettingsScreen(
-                          initialName: _profileName,
-                          initialImagePath: _profileImagePath,
-                          initialBio: _profileBio,
-                          onSave: (newName, newImagePath, newBio) {
-                            setState(() {
-                              _profileName = newName;
-                              _profileImagePath = newImagePath;
-                              _profileBio = newBio;
-                            });
-                          },
-                        ),
-                  ),
-                );
-              },
-            ),
-          ],
-        ),
         body: SafeArea(
           top: true,
           child: Column(
@@ -379,10 +319,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
             ],
           ),
-        ),
-        bottomNavigationBar: BottomNavBar(
-          selectedIndex: _selectedIndex,
-          onItemTapped: _onItemTapped,
         ),
       ),
     );
