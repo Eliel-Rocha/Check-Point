@@ -23,7 +23,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
     },
     {
       'title': 'Inicio da Jornada',
-      'description': 'C.',
+      'description': 'Conhecer 3 cidades.',
       'imagePath': 'assets/documento.png',
       'colorOne': Colors.red,
       'colorTwo': Colors.pink,
