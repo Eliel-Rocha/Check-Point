@@ -6,8 +6,6 @@ import 'ConfiguracoesPerfil.dart';
 import 'Conquistas.dart';
 import 'GradeDeFotos.dart';
 
-
-
 class ProfileScreen extends StatefulWidget {
   final String name;
   final String? imagePath;
