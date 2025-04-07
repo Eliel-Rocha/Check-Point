@@ -1,0 +1,17 @@
+# Ignora tudo
+*
+
+# Permite pastas
+!*/
+
+# Permite arquivos .dart
+!*.dart
+
+# Permite imagens
+!*.png
+!*.jpg
+!*.jpeg
+!*.gif
+!*.bmp
+!*.webp
+!*.svg
