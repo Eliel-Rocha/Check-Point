@@ -1,3 +1,4 @@
+import 'package:checkpointapp/map.dart';
 import 'package:flutter/material.dart';
 import '../timeline/timeline.dart';
 import '../Profile/TelaPerfil.dart';
@@ -61,7 +62,7 @@ class _RootPageState extends State<RootPage> {
         imagePath: _profileImagePath,
         bio: _profileBio,
       ),
-      TimelineScreen(),
+      FullMap(),
     ];
 
     return Scaffold(
