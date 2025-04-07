@@ -18,7 +18,7 @@ class _RootPageState extends State<RootPage> {
 
   final GlobalKey<ProfileScreenState> _profileKey = GlobalKey();
 
-  final List<String> _titles = ['Início', 'Perfil'];
+  final List<String> _titles = ['Início', 'Perfil', 'Mapa'];
 
   void _onItemTapped(int index) {
     setState(() {
@@ -61,10 +61,12 @@ class _RootPageState extends State<RootPage> {
         imagePath: _profileImagePath,
         bio: _profileBio,
       ),
+      TimelineScreen(),
     ];
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -116,6 +118,10 @@ class _RootPageState extends State<RootPage> {
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Perfil',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: 'Mapa',
           ),
         ],
       ),
