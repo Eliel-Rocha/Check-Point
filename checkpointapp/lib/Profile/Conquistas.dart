@@ -94,13 +94,13 @@ class _AchievementsGridState extends State<AchievementsGrid> {
                 Text(
                   achievement['title'],
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
                 ),
                 SizedBox(height: 4),
                 Text(
                   achievement['description'],
                   textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 14),
+                  style: TextStyle(fontSize: 13),
                 ),
               ],
             ),
