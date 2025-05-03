@@ -32,7 +32,7 @@ dependencies:
   flutter:
     sdk: flutter
   image_picker: ^0.8.4+1
-
+  circle_nav_bar: ^2.2.0
   permission_handler: ^11.3.1
   mapbox_maps_flutter: ^2.6.2
 

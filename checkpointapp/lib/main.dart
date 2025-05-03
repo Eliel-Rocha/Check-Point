@@ -1,6 +1,7 @@
 import 'package:checkpointapp/root.dart';
 import 'package:checkpointapp/sobre_o_app.dart';
 import 'package:flutter/material.dart';
+import 'root.dart';
 import 'login/login_page.dart';
 import 'login/startpage.dart';
 import 'login/signup.page.dart';
