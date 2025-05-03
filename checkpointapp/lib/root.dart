@@ -1,16 +1,26 @@
-import 'package:checkpointapp/map.dart';
+import 'package:checkpointapp/timeline/timeline.dart';
+import 'package:circle_nav_bar/circle_nav_bar.dart';
 import 'package:flutter/material.dart';
-import '../timeline/timeline.dart';
-import '../Profile/TelaPerfil.dart';
-import '../Profile/ConfiguracoesPerfil.dart';
+
+import 'Profile/ConfiguracoesPerfil.dart';
+import 'Profile/TelaPerfil.dart';
+import 'map.dart';
 
 class RootPage extends StatefulWidget {
   @override
-  _RootPageState createState() => _RootPageState();
+  State createState() => RootPageState();
 }
 
-class _RootPageState extends State<RootPage> {
-  int _selectedIndex = 0;
+class RootPageState extends State<RootPage> {
+  late int tabIndex = 1;
+  late PageController pageController;
+  final List<String> _titles = ['Perfil', 'Início', 'Mapa'];
+  final List<Color> _colorBottomNav = [
+    Color(0xFFFFE98F), // sunsetOrange
+    Color(0xFFF69E3E), //
+    Color(0xFFC885BA) // sunsetPurple
+  ];
+  final Color _colorTextAppBar = Color(0xFF6C0D75);
 
   // Dados do perfil compartilhados
   String _profileName = 'Nome_perfil';
@@ -19,12 +29,10 @@ class _RootPageState extends State<RootPage> {
 
   final GlobalKey<ProfileScreenState> _profileKey = GlobalKey();
 
-  final List<String> _titles = ['Início', 'Perfil', 'Mapa'];
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+  @override
+  void initState() {
+    super.initState();
+    pageController = PageController(initialPage: tabIndex);
   }
 
   void _openSettings() {
@@ -54,77 +62,131 @@ class _RootPageState extends State<RootPage> {
 
   @override
   Widget build(BuildContext context) {
+    List<Map<String, dynamic>> items = [
+      {'icon': Icons.person, 'label': 'Perfil'},
+      {'icon': Icons.home, 'label': 'Início'},
+      {'icon': Icons.map, 'label': 'Mapa'},
+    ];
+
     final List<Widget> _pages = [
-      TimelineScreen(),
       ProfileScreen(
         key: _profileKey,
         name: _profileName,
         imagePath: _profileImagePath,
         bio: _profileBio,
       ),
+      TimelineScreen(),
       FullMap(),
     ];
 
     return Scaffold(
+      extendBody: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         flexibleSpace: Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(8),
+              bottomRight: Radius.circular(8),
+            ),
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                Color(0xFFFF9933), // sunsetOrange
-                Color(0xFF663399), // sunsetPurple
-              ],
+              colors: _colorBottomNav,
             ),
           ),
         ),
-        leading: _selectedIndex != 0
+        leading: tabIndex != 1
             ? IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          icon: Icon(Icons.arrow_back, color: _colorTextAppBar),
           onPressed: () {
             setState(() {
-              _selectedIndex = 0;
+              tabIndex = 1;
             });
+            pageController.jumpToPage(tabIndex); // Move o PageView para a página correta
           },
         )
             : null,
         title: Text(
-          _titles[_selectedIndex],
-          style: const TextStyle(
-            color: Colors.white,
+          _titles[tabIndex],
+          style: TextStyle(
+            color: _colorTextAppBar,
             fontWeight: FontWeight.bold,
           ),
         ),
         centerTitle: true,
-        actions: _selectedIndex == 1
+        actions: tabIndex == 0
             ? [
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.white),
+            icon: Icon(Icons.settings, color: _colorTextAppBar),
             onPressed: _openSettings,
           ),
         ]
             : null,
       ),
-      body: _pages[_selectedIndex],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Início',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.map),
-            label: 'Mapa',
-          ),
-        ],
+      body: PageView(
+        controller: pageController,
+        onPageChanged: (v) {
+          setState(() {
+            tabIndex = v;
+          });
+        },
+        children: _pages,
+      ),
+      bottomNavigationBar: CircleNavBar(
+        inactiveIcons: List.generate(items.length, (index) {
+          return Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                items[index]['icon'],
+                size: 25,
+                color: _colorTextAppBar,
+              ),
+              SizedBox(height: 4),
+              Text(
+                items[index]['label'],
+                style: TextStyle(color: _colorTextAppBar, fontSize: 12,),
+              ),
+            ],
+          );
+        }),
+        activeIcons: List.generate(items.length, (index) {
+          return Icon(
+            items[index]['icon'],
+            size: 25,
+            color: _colorTextAppBar,
+          );
+        }),
+        padding: EdgeInsets.zero,
+        color: Colors.white,
+        circleColor: Colors.white,
+        height: 60,
+        circleWidth: 60,
+        activeIndex: tabIndex,
+        onTap: (index) {
+          setState(() {
+            tabIndex = index;
+          });
+          pageController.jumpToPage(tabIndex);
+        },
+        cornerRadius: const BorderRadius.only(
+          topLeft: Radius.circular(8),
+          topRight: Radius.circular(8),
+        ),
+        shadowColor: Colors.deepPurple,
+        circleShadowColor: Colors.deepPurple,
+        elevation: 10,
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: _colorBottomNav,
+        ),
+        circleGradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: _colorBottomNav,
+        ),
       ),
     );
   }
