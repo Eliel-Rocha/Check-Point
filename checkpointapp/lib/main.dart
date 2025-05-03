@@ -6,30 +6,38 @@ import 'login/startpage.dart';
 import 'login/signup.page.dart';
 import 'login/reset-password.page.dart';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';//precisa disso aqui
+import 'firebase_options.dart'; // Arquivo gerado pelo flutterfire configure
+
+
+void main() async {  // Adicione 'async' aqui
+  // Inicialize o Firebase antes de rodar o app, para rodar junto com o firebase,so isso mesmo e as dependencias
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Checkpoint App',
       theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
-      debugShowCheckedModeBanner: false, // <-- remove o banner
+      debugShowCheckedModeBanner: false,
       routes: {
-        '/start': (context) => StartPage(), // Página inicial
-        '/login': (context) => LoginPage(), // Página de login
-        '/cadastro': (context) => SignupPage(), // Página de cadastro
-        '/reset-password': (context) => ResetPasswordPage(), // Página de redefinição de senha
+        '/start': (context) => StartPage(),
+        '/login': (context) => LoginPage(),
+        '/cadastro': (context) => SignupPage(),
+        '/reset-password': (context) => ResetPasswordPage(),
         '/tela_principal': (context) => RootPage(),
         '/sobre_o_app': (context) => SobreoApp(),
       },
       home: StartPage(),
-
     );
   }
 }
