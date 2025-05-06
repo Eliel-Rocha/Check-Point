@@ -52,6 +52,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_launcher_icons: ^0.13.1
+
   smooth_page_indicator: ^1.1.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -61,6 +63,11 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/CheckPoint.png"
+  adaptive_icon_background: "#1C1E1F"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
