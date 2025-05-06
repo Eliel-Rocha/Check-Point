@@ -22,7 +22,7 @@ class RootPageState extends State<RootPage> {
   //Color(0xFF663399),
   Color(0xFF663399)
 ];
-  final Color _colorTextAppBar = Color(0xFF6C0D75);
+  final Color _colorTextAppBar = Colors.white;
 
   // Dados do perfil compartilhados
   String _profileName = 'Nome_perfil';
@@ -128,6 +128,7 @@ class RootPageState extends State<RootPage> {
       ),
       body: PageView(
         controller: pageController,
+        physics: NeverScrollableScrollPhysics(),
         onPageChanged: (v) {
           setState(() {
             tabIndex = v;
