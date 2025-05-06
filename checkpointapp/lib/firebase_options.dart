@@ -85,4 +85,5 @@ class DefaultFirebaseOptions {
     storageBucket: 'checkpointdb-a8cd7.firebasestorage.app',
     measurementId: 'G-BRZPGNZ7N1',
   );
+
 }
