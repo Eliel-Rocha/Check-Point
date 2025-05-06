@@ -36,6 +36,11 @@ dependencies:
   permission_handler: ^11.3.1
   mapbox_maps_flutter: ^2.6.2
 
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.12.1     # Para login (e-mail/Google/etc.)
+  cloud_firestore: ^4.15.1   # Para banco de dados
+  firebase_storage: ^11.7.0  # Para upload de imagens/vídeos
+
 
 
   # The following adds the Cupertino Icons font to your application.
