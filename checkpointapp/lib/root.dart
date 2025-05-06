@@ -16,10 +16,12 @@ class RootPageState extends State<RootPage> {
   late PageController pageController;
   final List<String> _titles = ['Perfil', 'Início', 'Mapa'];
   final List<Color> _colorBottomNav = [
-    Color(0xFFFFE98F), // sunsetOrange
-    Color(0xFFF69E3E), //
-    Color(0xFFC885BA) // sunsetPurple
-  ];
+  //Color(0xFFFF9933),
+  Color(0xFFFF9933),
+  //Color(0xFFC885BA),
+  //Color(0xFF663399),
+  Color(0xFF663399)
+];
   final Color _colorTextAppBar = Color(0xFF6C0D75);
 
   // Dados do perfil compartilhados
