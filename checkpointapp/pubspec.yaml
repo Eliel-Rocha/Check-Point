@@ -36,6 +36,11 @@ dependencies:
   permission_handler: ^11.3.1
   mapbox_maps_flutter: ^2.6.2
 
+  firebase_core: ^2.24.0
+  firebase_auth: ^4.12.1     # Para login (e-mail/Google/etc.)
+  cloud_firestore: ^4.15.1   # Para banco de dados
+  firebase_storage: ^11.7.0  # Para upload de imagens/vídeos
+
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -47,6 +52,8 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
+  flutter_launcher_icons: ^0.13.1
+
   smooth_page_indicator: ^1.1.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
@@ -56,6 +63,11 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/CheckPoint.png"
+  adaptive_icon_background: "#1C1E1F"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
