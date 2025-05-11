@@ -26,10 +26,10 @@ class _TimelineScreenState extends State<TimelineScreen> {
     },
   );
 
-  void updateComments(int index, List<Map<String, String>> newComments) {
+  void updateComments(int index, List<Map<String, String>> updatedList) {
     setState(() {
-      posts[index]['commentList'] = List.from(newComments);
-      posts[index]['comments'] = newComments.length;
+      posts[index]['commentList'] = updatedList;
+      posts[index]['comments'] = updatedList.length;
     });
   }
 

@@ -76,20 +76,38 @@ class PostCard extends StatelessWidget {
                   ),
                 ),
                 GestureDetector(
-                  onTap: () async {
-                    List<Map<String, String>> updatedComments =
-                    await Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => CommentScreen(
-                          post: post,
-                          postIndex: postIndex,
-                          currentUser: currentUser,
-                        ),
-                      ),
-                    );
-
-                    updateComments(postIndex, updatedComments);
+                  onTap: () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                          ),
+                          child: DraggableScrollableSheet(
+                            expand: false,
+                            initialChildSize: 0.85,
+                            minChildSize: 0.5,
+                            maxChildSize: 0.95,
+                            builder: (context, scrollController) {
+                              return CommentScreen(
+                                post: post,
+                                postIndex: postIndex,
+                                currentUser: currentUser,
+                                updateComments: updateComments,
+                              );
+                            },
+                          ),
+                        );
+                      },
+                    ).then((updatedComments) {
+                      if (updatedComments != null) {
+                        updateComments(postIndex, updatedComments as List<Map<String, String>>);
+                      }
+                    });
                   },
                   child: Row(
                     children: [
