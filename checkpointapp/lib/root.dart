@@ -1,7 +1,9 @@
+import 'package:checkpointapp/BancoDeDados/UserPreferencesServices.dart';
 import 'package:checkpointapp/timeline/timeline.dart';
 import 'package:circle_nav_bar/circle_nav_bar.dart';
 import 'package:flutter/material.dart';
 
+import 'Configuracoes.dart';
 import 'Profile/ConfiguracoesPerfil.dart';
 import 'Profile/TelaPerfil.dart';
 import 'map.dart';
@@ -14,15 +16,9 @@ class RootPage extends StatefulWidget {
 class RootPageState extends State<RootPage> {
   late int tabIndex = 1;
   late PageController pageController;
-  final List<String> _titles = ['Perfil', 'Início', 'Mapa'];
-  final List<Color> _colorBottomNav = [
-  //Color(0xFFFF9933),
-  Color(0xFFFF9933),
-  //Color(0xFFC885BA),
-  //Color(0xFF663399),
-  Color(0xFF663399)
-];
-  final Color _colorTextAppBar = Color(0xFF6C0D75);
+  final List<String> _titles = ['Perfil', 'Início', 'Mapa', 'Configurações'];
+  final List<Color> _colorBottomNav = UserPreferencesService.getThemeColor();
+  final Color _colorTextAppBar = Colors.white;
 
   // Dados do perfil compartilhados
   String _profileName = 'Nome_perfil';
@@ -68,6 +64,7 @@ class RootPageState extends State<RootPage> {
       {'icon': Icons.person, 'label': 'Perfil'},
       {'icon': Icons.home, 'label': 'Início'},
       {'icon': Icons.map, 'label': 'Mapa'},
+      {'icon': Icons.settings, 'label': 'Configurações'}
     ];
 
     final List<Widget> _pages = [
@@ -79,6 +76,7 @@ class RootPageState extends State<RootPage> {
       ),
       TimelineScreen(),
       FullMap(),
+      ConfigPage(),
     ];
 
     return Scaffold(
@@ -128,6 +126,7 @@ class RootPageState extends State<RootPage> {
       ),
       body: PageView(
         controller: pageController,
+        physics: NeverScrollableScrollPhysics(),
         onPageChanged: (v) {
           setState(() {
             tabIndex = v;
