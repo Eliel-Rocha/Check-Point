@@ -33,7 +33,7 @@ class UserFirestoreService {
     }
   }
 
-  // Exemplo: Obter dados do usuário logado
+  //Obter dados do usuário logado
   Future<Map<String, dynamic>?> getDadosUsuarioLogado() async {
     final userId = _auth.currentUser?.uid;
     if (userId == null) {

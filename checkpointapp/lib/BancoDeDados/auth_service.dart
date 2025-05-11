@@ -26,6 +26,7 @@ class AuthService {
       // 2. Atualiza nome no perfil do Auth
       await userCredential.user?.updateDisplayName(nome);
 
+
       return userCredential;
     } on FirebaseAuthException catch (e) {
       throw e;
@@ -40,11 +41,29 @@ class AuthService {
     required String senha,
   }) async {
     try {
-      return await _auth.signInWithEmailAndPassword(
-        email: email,
+      UserCredential userCredential = await _auth.signInWithEmailAndPassword(
+        email: email.trim(), // Adiciona trim() para remover espaços
         password: senha,
       );
+
+      // Verifica se o e-mail foi verificado
+      if (!userCredential.user!.emailVerified) {
+        await logout();
+        throw FirebaseAuthException(
+          code: 'email-not-verified',
+          message: 'Por favor, verifique seu e-mail antes de fazer login',
+        );
+      }
+
+      return userCredential;
     } on FirebaseAuthException catch (e) {
+      // Adiciona tratamento para usuário desabilitado
+      if (e.code == 'user-disabled') {
+        throw FirebaseAuthException(
+          code: 'user-disabled',
+          message: 'Esta conta foi desativada',
+        );
+      }
       throw e;
     }
   }
