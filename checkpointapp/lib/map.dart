@@ -7,6 +7,9 @@ import 'package:geolocator/geolocator.dart' as geo;
 String token = "pk.eyJ1IjoiZWxpZWxqdW5pb3IiLCJhIjoiY204M2R6d3N2MG1wMjJqb3Bvejg5M3c0cSJ9.tQgdHOalSYxxPusoxyMpFA";
 String urlStyle = "mapbox://styles/elieljunior/cm84uu252007n01qz8nxy5ds7";
 
+
+
+
 class FullMap extends StatefulWidget {
   const FullMap({super.key});
 
@@ -15,14 +18,36 @@ class FullMap extends StatefulWidget {
 }
 
 class FullMapState extends State<FullMap> {
-  MapboxMap? mapboxMap;
+  late final Future<geo.Position?> _posFuture;
 
   @override
   void initState() {
     super.initState();
+    _posFuture = _initLocation();
     _requestPermissions();
     _checkLocationServices();
   }
+
+
+  Future<geo.Position?> _initLocation() async {
+    final status = await Permission.location.request();
+    if (status != PermissionStatus.granted) {
+      if (kDebugMode) print("Permissão negada");
+      return null;
+    }
+    if (!await geo.Geolocator.isLocationServiceEnabled()) {
+      if (kDebugMode) print("GPS desativado");
+    }
+    try {
+      return await geo.Geolocator.getCurrentPosition(
+        desiredAccuracy: geo.LocationAccuracy.high,
+      );
+    } catch (e) {
+      if (kDebugMode) print("Erro ao obter posição: $e");
+      return null;
+    }
+  }
+
 
   Future<void> _requestPermissions() async {
     var status = await Permission.location.request();
@@ -46,29 +71,25 @@ class FullMapState extends State<FullMap> {
   }
 
 
-  _onMapCreated(MapboxMap mapboxMap) async {
-    this.mapboxMap = mapboxMap;
-
+  _onMapCreated(MapboxMap mapboxMap, geo.Position? pos) async {
     await mapboxMap.loadStyleURI(urlStyle);
 
-
-    geo.Position position = await geo.Geolocator.getCurrentPosition();
-    await mapboxMap.setCamera(CameraOptions(
-      center: Point(coordinates: Position(position.longitude, position.latitude)),
-      zoom: 16.0,
-    ));
-
-
-    await mapboxMap.location.updateSettings(LocationComponentSettings(
-      enabled: true, // necessário para ativar a exibição da localização
-      pulsingEnabled: true,
-      locationPuck: LocationPuck(
-        locationPuck3D: LocationPuck3D(
-          modelUri: "https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Duck/glTF-Embedded/Duck.gltf",
-        ),
+    await mapboxMap.location.updateSettings(
+      LocationComponentSettings(
+        enabled: true,
+        pulsingEnabled: true,
       ),
-    ));
+    );
 
+    // se temos posição, centraliza câmera
+    if (pos != null) {
+      await mapboxMap.setCamera(
+        CameraOptions(
+          center: Point(coordinates: Position(pos.longitude, pos.latitude)),
+          zoom: 16.0,
+        ),
+      );
+    }
 
 
 
@@ -82,11 +103,25 @@ class FullMapState extends State<FullMap> {
   Widget build(BuildContext context) {
     MapboxOptions.setAccessToken(token);
 
-    return Scaffold(
-      body: MapWidget(
-        key: const ValueKey("mapWidget"),
-        onMapCreated: _onMapCreated,
-      ),
+    return FutureBuilder<geo.Position?>(
+      future: _posFuture,
+      builder: (context, snap) {
+        //Conferindo localização
+        if (snap.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snap.data == null) {
+          return const Center(child: Text("Não foi possível obter localização."));
+        }
+
+        return Scaffold(
+          body: MapWidget(
+            key: const ValueKey("map"),
+            styleUri: urlStyle,
+            onMapCreated: (map) => _onMapCreated(map, snap.data),
+          ),
+        );
+      },
     );
   }
 }
