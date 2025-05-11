@@ -35,15 +35,12 @@ dependencies:
   circle_nav_bar: ^2.2.0
   permission_handler: ^11.3.1
   mapbox_maps_flutter: ^2.6.0
-  geolocator: ^14.0.0
+  geolocator: ^12.0.0
 
   firebase_core: ^2.24.0
   firebase_auth: ^4.12.1     # Para login (e-mail/Google/etc.)
   cloud_firestore: ^4.15.1   # Para banco de dados
   firebase_storage: ^11.7.0  # Para upload de imagens/vídeos
-
-  sqflite: ^2.4.2
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
