@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
 import 'package:checkpointapp/login/startpage.dart';
-import 'package:checkpointapp/BancoDeDados/user_firestore_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+
 
 class SettingsScreen extends StatefulWidget {
   final String initialName;
@@ -184,7 +183,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _tempBio = value;
               },
             ),
-            //---------------logout----------------
+
+
+
+
+
+
+            //---------------logout---------------------------------------------------
             SizedBox(height: 20),
             TextButton( // Usando TextButton para uma ação secundária em configurações
                 onPressed: () async {
@@ -197,13 +202,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     // Navega para a tela inicial e remove todas as rotas anteriores
                     // Isso acionará o AuthWrapper para navegar para a tela de login/cadastro
                     Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => StartPage()), // Sua tela inicial
+                      MaterialPageRoute(builder: (context) => StartPage()), // tela inicial
                           (Route<dynamic> route) => false, // Remove todas as rotas
                     );
 
                   } catch (e) {
                     print('Erro ao fazer logout: $e');
-                    // Opcional: Mostrar um Snackbar ou AlertDialog para o usuário
+                    // Mostrar um Snackbar ou AlertDialog para o usuário
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
                         content: Text('Erro ao fazer logout: $e'),
@@ -213,11 +218,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   }
                 },
               style: TextButton.styleFrom(
-                foregroundColor: Colors.red, // Cor do texto do botão Sair
-                textStyle: TextStyle(fontSize: 18), // Opcional: Tamanho da fonte
+                foregroundColor: Colors.red,
+                textStyle: TextStyle(fontSize: 18),
               ),
               child: Text('Sair'),
             ),
+            //--------------------------------------fim do logout--------------------------------------------------
+
+
+
+
+
           ],
 
         ),

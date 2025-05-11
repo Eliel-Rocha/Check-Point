@@ -3,32 +3,33 @@ import 'package:flutter/material.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
 import 'package:checkpointapp/BancoDeDados/user_firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-//import 'package:shared_preferences/shared_preferences.dart';
 
 class SignupPage extends StatefulWidget {
   @override
   _SignupPageState createState() => _SignupPageState();
 }
+//-----------------variaveis para controle de estado------------------------------------------------------------------------------------------------ -----------------------------------------------------------------------------------------------
 
 class _SignupPageState extends State<SignupPage> {
-
-  // Variáveis para armazenar os dados do usuário
   final _formKey = GlobalKey<FormState>();
   final _nomeController = TextEditingController();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
 
-  //variaveis para o firebase, auth e firestore serve para acessar o banco de dados
   final AuthService _authService = AuthService();
   final UserFirestoreService _userFirestoreService = UserFirestoreService();
 
-  // Variáveis para controle de estado
   bool _isLoading = false;
   String? _errorMessage;
 
-  //-------------- função para cadastrar usuário -----------------//
+  bool _usuarioCadastrado = false;
+  User? _usuarioAtual;
+//-----------------------fim da variaveis para controle de estado------------------------------------------------------------------------------------------------ -----------------------------------------------------------------------------------------------
+
+
+
+  //----------------------função de cadastro------------------------------------------------------------------------------------------------
   Future<void> _cadastrarUsuario() async {
-    // Verifica se o formulário é válido
     if (_formKey.currentState?.validate() ?? false) {
       setState(() {
         _isLoading = true;
@@ -36,20 +37,33 @@ class _SignupPageState extends State<SignupPage> {
       });
 
       try {
-        // Inicia o cadastro no Firebase Auth
         debugPrint('Iniciando cadastro...');
 
-        // Cadastra o usuário no Firebase Auth
         final userCredential = await _authService.cadastrarComEmailSenha(
           email: _emailController.text.trim(),
           senha: _senhaController.text.trim(),
           nome: _nomeController.text.trim(),
         );
 
-        // Salva os dados iniciais do usuário no Firestore
-        debugPrint('Usuário criado no Auth: ${userCredential.user?.uid}');
+        await userCredential.user?.sendEmailVerification();
 
-        // Salva os dados iniciais do usuário no Firestore
+        _usuarioCadastrado = true;
+        _usuarioAtual = userCredential.user;
+
+        await showDialog(
+          context: context,
+          builder: (_) => AlertDialog(
+            title: Text('Verifique seu e-mail'),
+            content: Text('Enviamos um link de verificação para o seu e-mail. Clique nele para ativar sua conta.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text('OK'),
+              ),
+            ],
+          ),
+        );
+
         if (userCredential.user?.uid != null) {
           await _userFirestoreService.salvarDadosIniciaisUsuario(
             userId: userCredential.user!.uid,
@@ -59,10 +73,6 @@ class _SignupPageState extends State<SignupPage> {
           debugPrint('Dados salvos no Firestore');
         }
 
-        // Salva o ID do usuário no SharedPreferences
-        Navigator.of(context).pushReplacement(
-          MaterialPageRoute(builder: (context) => SobreoApp()),
-        );
       } on FirebaseAuthException catch (e) {
         debugPrint('Erro no cadastro: ${e.code}');
         setState(() {
@@ -76,14 +86,46 @@ class _SignupPageState extends State<SignupPage> {
       } finally {
         setState(() => _isLoading = false);
       }
-    } else {
-      debugPrint('Formulário inválido');
     }
   }
+  //----------------------fim da função de cadastro------------------------------------------------------------------------------------------------
+
+
+
+  //--------------------------função de verificar email------------------------------------------------------------------------------------------------
+  Future<void> _verificarEmailEContinuar() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      await _usuarioAtual?.reload();
+      _usuarioAtual = FirebaseAuth.instance.currentUser;
+
+      if (_usuarioAtual?.emailVerified == true) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => SobreoApp()),
+        );
+      } else {
+        setState(() {
+          _errorMessage = "Seu e-mail ainda não foi verificado.";
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _errorMessage = "Erro ao verificar e-mail: $e";
+      });
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+  //--------------------------fim da função de verificar email------------------------------------------------------------------------------------------------
 
   @override
-  void dispose() {
-    // Limpa os controladores quando o widget é destruído
+  void dispose() {//limpa os campos ao sair da tela
     _nomeController.dispose();
     _emailController.dispose();
     _senhaController.dispose();
@@ -97,11 +139,10 @@ class _SignupPageState extends State<SignupPage> {
         child: Container(
           padding: EdgeInsets.only(top: 10, left: 40, right: 40),
           color: Colors.white,
-          child: Form( // Adicionei o Form aqui
+          child: Form(
             key: _formKey,
             child: ListView(
               children: <Widget>[
-                // Foto de perfil
                 Container(
                   width: 150,
                   height: 150,
@@ -146,12 +187,9 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                 ),
 
+                //------------------Email----------------------//
                 SizedBox(height: 20),
-
-                // Input nome
                 TextFormField(
-                  //aqui é onde eu coloco o controlador e o validator,
-                  // para validar se o campo está vazio ou não
                   controller: _nomeController,
                   validator: (value) => value!.isEmpty ? 'Informe seu nome' : null,
                   decoration: InputDecoration(
@@ -167,15 +205,15 @@ class _SignupPageState extends State<SignupPage> {
 
                 SizedBox(height: 10),
 
-                // Input email
+                //------------------verificar email----------------------//
                 TextFormField(
-                  //aqui é onde eu coloco o controlador e o validator, para validar se o campo está vazio ou não
                   controller: _emailController,
                   validator: (value) {
                     if (value!.isEmpty) return 'Informe seu email';
                     if (!value.contains('@')) return 'Email inválido';
                     return null;
                   },
+                  //-----------------fim da validação do campo de e-mail-------------------
                   keyboardType: TextInputType.emailAddress,
                   decoration: InputDecoration(
                     labelText: "E-mail",
@@ -187,17 +225,18 @@ class _SignupPageState extends State<SignupPage> {
                   ),
                   style: TextStyle(fontSize: 20),
                 ),
+                //------------------fim emai----------------------//
 
+
+                //---------------------------Senha-------------------------------
                 SizedBox(height: 10),
-
-                // Input senha
                 TextFormField(
-                  //aqui é onde eu coloco o controlador e o validator,
-                  //para validar se o campo está vazio ou não
                   controller: _senhaController,
+                  //---------------validador de senha----------------------------------------------//
                   validator: (value) => value!.length < 6
                       ? 'Mínimo 6 caracteres'
                       : null,
+                  //------------------fim da validação do campo de senha----------------------------------------------//
                   obscureText: true,
                   decoration: InputDecoration(
                     labelText: "Senha",
@@ -210,7 +249,6 @@ class _SignupPageState extends State<SignupPage> {
                   style: TextStyle(fontSize: 20),
                 ),
 
-                // Mensagem de erro
                 if (_errorMessage != null)
                   Padding(
                     padding: EdgeInsets.symmetric(vertical: 10),
@@ -219,10 +257,12 @@ class _SignupPageState extends State<SignupPage> {
                       style: TextStyle(color: Colors.red),
                     ),
                   ),
+                //-----------------fim da senha----------------------//
 
+
+                //-----------------cadastrar----------------------//
                 SizedBox(height: 20),
 
-                // Botão cadastrar - CORRIGIDO
                 Container(
                   height: 60,
                   decoration: BoxDecoration(
@@ -237,13 +277,15 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                     borderRadius: BorderRadius.all(Radius.circular(5)),
                   ),
+                  //---------------ver se o usuario ja esta cadastrado----------------------------------------------//
+                  /* essa parte serve para verificar se o usuario ja esta cadastrado e se estiver,
+                   ele vai para a tela de sobre o app*/
                   child: _isLoading
                       ? Center(child: CircularProgressIndicator(color: Colors.white))
                       : TextButton(
-                    //aqui eu coloco a função de cadastrar, que está no auth_service.dart.
-                    onPressed: _cadastrarUsuario,
+                    onPressed: _usuarioCadastrado ? _verificarEmailEContinuar : _cadastrarUsuario,
                     child: Text(
-                      "Cadastrar",
+                      _usuarioCadastrado ? "Continuar" : "Cadastrar",
                       style: TextStyle(
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -255,7 +297,6 @@ class _SignupPageState extends State<SignupPage> {
 
                 SizedBox(height: 10),
 
-                // Botão cancelar
                 Container(
                   height: 40,
                   alignment: Alignment.center,
