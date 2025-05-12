@@ -74,6 +74,7 @@ class _LocationSearchState extends State<LocationSearch> {
         ),
         if (_results.isNotEmpty)
           Container(
+            color: Colors.white,
             constraints: const BoxConstraints(maxHeight: 200),
             child: ListView.builder(
               shrinkWrap: true,

@@ -40,6 +40,32 @@ class FullMapState extends State<FullMap> {
   PointAnnotationManager? _pointAnnotationManager;
 
 
+  Future<void> _atualizarMarcadoresNoMapa() async {
+    if (_pointAnnotationManager == null) return;
+
+    // Remove todos os marcadores existentes
+    await _pointAnnotationManager!.deleteAll();
+
+    for (var loc in _localizacoesSalvas) {
+      final point = Point(
+        coordinates: Position(loc.longitude, loc.latitude),
+      );
+
+      final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
+      final Uint8List imageData = bytes.buffer.asUint8List();
+
+      final options = PointAnnotationOptions(
+        geometry: point,
+        image: imageData,
+        iconSize: 0.06, // Ajuste de tamanho
+      );
+
+      await _pointAnnotationManager!.create(options);
+    }
+  }
+
+
+
   List<LocationModel> _localizacoesSalvas = [];
   Future<void> _carregarLocalizacoes() async {
     final localizacoes = await LocationDatabase.getAllLocations();
@@ -235,7 +261,10 @@ class FullMapState extends State<FullMap> {
 
                             await LocationDatabase.insertLocationGeo(pos, descricao);
                             _descriptionController.clear();
+
+
                             await _carregarLocalizacoes();
+                            await _atualizarMarcadoresNoMapa();
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(content: Text("Localização salva com sucesso!")),
