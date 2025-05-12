@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'Configuracoes.dart';
 import 'Profile/ConfiguracoesPerfil.dart';
 import 'Profile/TelaPerfil.dart';
-import 'map.dart';
+import 'Mapa/map.dart';
 
 class RootPage extends StatefulWidget {
   @override
