@@ -1,9 +1,11 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:checkpointapp/BancoDeDados/Localizacoes.dart';
+import 'package:checkpointapp/Mapa/search_place.dart';
 
 String token = "pk.eyJ1IjoiZWxpZWxqdW5pb3IiLCJhIjoiY204M2R6d3N2MG1wMjJqb3Bvejg5M3c0cSJ9.tQgdHOalSYxxPusoxyMpFA";
 String urlStyle = "mapbox://styles/elieljunior/cm84uu252007n01qz8nxy5ds7";
@@ -23,12 +25,46 @@ class FullMapState extends State<FullMap> {
   final TextEditingController _descriptionController = TextEditingController();
 
 
+  void _moveToLocation(double lat, double lng) {
+    _mapboxMap?.setCamera(CameraOptions(
+      center: Point(coordinates: Position(lng, lat)),
+      zoom: 14.0,
+    ));
+  }
+
+
+
+
+
+  MapboxMap? _mapboxMap;
+  PointAnnotationManager? _pointAnnotationManager;
+
+
   List<LocationModel> _localizacoesSalvas = [];
   Future<void> _carregarLocalizacoes() async {
     final localizacoes = await LocationDatabase.getAllLocations();
+
     setState(() {
       _localizacoesSalvas = localizacoes;
     });
+
+    // Após atualizar a lista, redesenha os marcadores
+    if (_mapboxMap != null && _pointAnnotationManager != null) {
+      await _pointAnnotationManager!.deleteAll();
+
+      for (var loc in localizacoes) {
+        final point = Point(
+          coordinates: Position(loc.longitude, loc.latitude),
+        );
+
+        final options = PointAnnotationOptions(
+          geometry: point,
+          iconSize: 2.0,
+        );
+
+        await _pointAnnotationManager!.create(options);
+      }
+    }
   }
 
 
@@ -84,7 +120,9 @@ class FullMapState extends State<FullMap> {
   }
 
 
-  _onMapCreated(MapboxMap mapboxMap, geo.Position? pos) async {
+  Future<void> _onMapCreated(MapboxMap mapboxMap, geo.Position? pos) async {
+    _mapboxMap = mapboxMap;
+
     await mapboxMap.loadStyleURI(urlStyle);
 
     await mapboxMap.location.updateSettings(
@@ -94,7 +132,6 @@ class FullMapState extends State<FullMap> {
       ),
     );
 
-    // se temos posição, centraliza câmera
     if (pos != null) {
       await mapboxMap.setCamera(
         CameraOptions(
@@ -104,9 +141,30 @@ class FullMapState extends State<FullMap> {
       );
     }
 
+    _pointAnnotationManager =
+    await mapboxMap.annotations.createPointAnnotationManager();
 
+    // Carrega o ícone da imagem personalizada
+    final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
+    final Uint8List imageData = bytes.buffer.asUint8List();
 
+    // Adiciona os marcadores com ícone
+    for (var loc in _localizacoesSalvas) {
+      final point = Point(
+        coordinates: Position(loc.longitude, loc.latitude),
+      );
+
+      final options = PointAnnotationOptions(
+        geometry: point,
+        iconSize: 0.06,
+        image: imageData,
+      );
+
+      await _pointAnnotationManager?.create(options);
+    }
   }
+
+
 
 
 
@@ -137,6 +195,16 @@ class FullMapState extends State<FullMap> {
                 styleUri: urlStyle,
                 onMapCreated: (map) => _onMapCreated(map, pos),
               ),
+
+              Positioned(
+                  top: 40,
+                  left: 16,
+                  right: 16,
+                  child: LocationSearch(
+                  onResult: _moveToLocation,
+                  ),
+              ),
+
               DraggableScrollableSheet(
                 initialChildSize: 0.4,
                 minChildSize: 0.2,
