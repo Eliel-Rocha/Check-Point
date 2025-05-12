@@ -22,12 +22,23 @@ class FullMapState extends State<FullMap> {
   late final Future<geo.Position?> _posFuture;
   final TextEditingController _descriptionController = TextEditingController();
 
+
+  List<LocationModel> _localizacoesSalvas = [];
+  Future<void> _carregarLocalizacoes() async {
+    final localizacoes = await LocationDatabase.getAllLocations();
+    setState(() {
+      _localizacoesSalvas = localizacoes;
+    });
+  }
+
+
   @override
   void initState() {
     super.initState();
     _posFuture = _initLocation();
     _requestPermissions();
     _checkLocationServices();
+    _carregarLocalizacoes();
   }
 
 
@@ -144,9 +155,45 @@ class FullMapState extends State<FullMap> {
                         ),
                         SizedBox(height: 16),
                         ElevatedButton(
-                          onPressed: () => LocationDatabase.insertLocationGeo(pos, _descriptionController.text),
+                          onPressed: () async {
+                            String descricao = _descriptionController.text.trim();
+
+                            if (descricao.isEmpty) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text("Por favor, insira uma descrição.")),
+                              );
+                              return;
+                            }
+
+                            await LocationDatabase.insertLocationGeo(pos, descricao);
+                            _descriptionController.clear();
+                            await _carregarLocalizacoes();
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text("Localização salva com sucesso!")),
+                            );
+                          },
                           child: const Text("Salvar Localização"),
                         ),
+
+
+                        SizedBox(height: 16),
+                        Text("Localizações Salvas"),
+                        ..._localizacoesSalvas.map((loc) {
+                          return ListTile(
+                            title: Text(loc.description),
+                            subtitle: Text(
+                              'Lat: ${loc.latitude.toStringAsFixed(5)}, '
+                                  'Lng: ${loc.longitude.toStringAsFixed(5)}\n'
+                                  'Data: ${loc.timestamp.toLocal()}',
+
+                            ),
+                            isThreeLine: true,
+                          );
+                        }).toList(),
+                        SizedBox(height: 50),
+
+
                       ],
                     ),
                   );

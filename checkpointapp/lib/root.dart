@@ -2,7 +2,6 @@ import 'package:checkpointapp/BancoDeDados/UserPreferencesServices.dart';
 import 'package:checkpointapp/timeline/timeline.dart';
 import 'package:circle_nav_bar/circle_nav_bar.dart';
 import 'package:flutter/material.dart';
-
 import 'Configuracoes.dart';
 import 'Profile/ConfiguracoesPerfil.dart';
 import 'Profile/TelaPerfil.dart';
