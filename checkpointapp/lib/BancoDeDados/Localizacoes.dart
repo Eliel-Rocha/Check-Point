@@ -44,7 +44,6 @@ class LocationDatabase {
   static Future<Database> _initDB() async {
     final dbPath = await getDatabasesPath();
     final path = join(dbPath, 'locations.db');
-
     return openDatabase(
       path,
       version: 2,

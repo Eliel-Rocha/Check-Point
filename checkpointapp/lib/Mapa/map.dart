@@ -83,12 +83,8 @@ class FullMapState extends State<FullMap> {
           coordinates: Position(loc.longitude, loc.latitude),
         );
 
-        final options = PointAnnotationOptions(
-          geometry: point,
-          iconSize: 2.0,
-        );
 
-        await _pointAnnotationManager!.create(options);
+        await _pointAnnotationManager!.create(await getoptions());
       }
     }
   }
@@ -181,20 +177,21 @@ class FullMapState extends State<FullMap> {
         coordinates: Position(loc.longitude, loc.latitude),
       );
 
-      final options = PointAnnotationOptions(
-        geometry: point,
-        iconSize: 0.06,
-        image: imageData,
-      );
 
-      await _pointAnnotationManager?.create(options);
+      await _pointAnnotationManager?.create(await getoptions());
     }
   }
 
+  Future<PointAnnotationOptions> getoptions() async{
+    final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
+    final Uint8List imageData = bytes.buffer.asUint8List();
 
-
-
-
+    return PointAnnotationOptions(
+      geometry: Point(coordinates: Position(0, 0)),
+      iconSize: 0.06,
+      image: imageData,
+    );
+  }
 
 
   @override
