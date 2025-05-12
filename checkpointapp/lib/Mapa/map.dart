@@ -30,15 +30,41 @@ class FullMapState extends State<FullMap> {
       center: Point(coordinates: Position(lng, lat)),
       zoom: 14.0,
     ));
+
   }
-
-
-
 
 
   MapboxMap? _mapboxMap;
   PointAnnotationManager? _pointAnnotationManager;
 
+  Future<void> _ajustarCameraParaTodosOsPontos() async {
+    // Se não há pontos ou mapa não inicializado, aborta
+    if (_localizacoesSalvas.isEmpty || _mapboxMap == null) return;
+
+    // Converte cada LocationModel (latitude/lng) em Point do Mapbox
+    final List<Point> pontos = _localizacoesSalvas.map((loc) {
+      return Point(coordinates: Position(loc.longitude, loc.latitude));
+    }).toList();
+
+    try {
+      // Calcula as opções de câmera que enquadram todos os pontos, com padding
+      final CameraOptions cameraOptions = await _mapboxMap!.cameraForCoordinates(
+        pontos,
+        MbxEdgeInsets.decode(80),  // margem interna para não colar nos cantos
+        0,                   // bearing (rotação) em graus
+        0,                   // pitch (inclinação) em graus
+      );
+
+      // Anima a câmera para esse enquadramento em 1,5s
+      await _mapboxMap!.flyTo(
+        cameraOptions,
+        MapAnimationOptions(duration: 1500),
+      );
+    } catch (e) {
+      // Em caso de erro, imprime no console para debug
+      print('Erro ao ajustar câmera: $e');
+    }
+  }
 
   Future<void> _atualizarMarcadoresNoMapa() async {
     if (_pointAnnotationManager == null) return;
@@ -62,11 +88,14 @@ class FullMapState extends State<FullMap> {
 
       await _pointAnnotationManager!.create(options);
     }
+    _ajustarCameraParaTodosOsPontos();
   }
 
 
 
   List<LocationModel> _localizacoesSalvas = [];
+
+
   Future<void> _carregarLocalizacoes() async {
     final localizacoes = await LocationDatabase.getAllLocations();
 
@@ -84,9 +113,11 @@ class FullMapState extends State<FullMap> {
         );
 
 
-        await _pointAnnotationManager!.create(await getoptions());
+        await _pointAnnotationManager!.create(await getoptions(point));
       }
     }
+    //TODO: aquii!!
+    _ajustarCameraParaTodosOsPontos();
   }
 
 
@@ -178,20 +209,22 @@ class FullMapState extends State<FullMap> {
       );
 
 
-      await _pointAnnotationManager?.create(await getoptions());
+      await _pointAnnotationManager?.create(await getoptions(point));
     }
+    _ajustarCameraParaTodosOsPontos();
   }
 
-  Future<PointAnnotationOptions> getoptions() async{
+  Future<PointAnnotationOptions> getoptions(Point point) async{
     final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
     final Uint8List imageData = bytes.buffer.asUint8List();
 
     return PointAnnotationOptions(
-      geometry: Point(coordinates: Position(0, 0)),
+      geometry: Point(coordinates: Position(point.coordinates.lat, point.coordinates.lng)),
       iconSize: 0.06,
       image: imageData,
     );
   }
+
 
 
   @override
