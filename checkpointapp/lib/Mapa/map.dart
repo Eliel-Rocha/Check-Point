@@ -149,6 +149,7 @@ class FullMapState extends State<FullMap> {
   Future<void> _onMapCreated(MapboxMap mapboxMap, geo.Position? pos) async {
     _mapboxMap = mapboxMap;
 
+
     await mapboxMap.loadStyleURI(urlStyle);
 
     await mapboxMap.location.updateSettings(
@@ -275,7 +276,6 @@ class FullMapState extends State<FullMap> {
 
 
                         SizedBox(height: 16),
-                        Text("Localizações Salvas"),
                         ..._localizacoesSalvas.map((loc) {
                           return ListTile(
                             title: Text(loc.description),
@@ -283,11 +283,75 @@ class FullMapState extends State<FullMap> {
                               'Lat: ${loc.latitude.toStringAsFixed(5)}, '
                                   'Lng: ${loc.longitude.toStringAsFixed(5)}\n'
                                   'Data: ${loc.timestamp.toLocal()}',
-
                             ),
                             isThreeLine: true,
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                IconButton(
+                                  icon: Icon(Icons.edit, color: Colors.blue),
+                                  onPressed: () async {
+                                    final controller = TextEditingController(text: loc.description);
+
+                                    await showDialog(
+                                      context: context,
+                                      builder: (context) {
+                                        return AlertDialog(
+                                          title: Text("Editar Descrição"),
+                                          content: TextField(
+                                            controller: controller,
+                                            decoration: InputDecoration(hintText: "Nova descrição"),
+                                          ),
+                                          actions: [
+                                            TextButton(
+                                              onPressed: () => Navigator.pop(context),
+                                              child: Text("Cancelar"),
+                                            ),
+                                            ElevatedButton(
+                                              onPressed: () async {
+                                                final novaDescricao = controller.text.trim();
+                                                if (novaDescricao.isNotEmpty) {
+                                                  final novaLoc = LocationModel(
+                                                    id: loc.id,
+                                                    latitude: loc.latitude,
+                                                    longitude: loc.longitude,
+                                                    timestamp: loc.timestamp,
+                                                    description: novaDescricao,
+                                                  );
+                                                  await LocationDatabase.updateLocation(novaLoc);
+                                                  Navigator.pop(context);
+                                                  await _carregarLocalizacoes();
+                                                  await _atualizarMarcadoresNoMapa();
+                                                  ScaffoldMessenger.of(context).showSnackBar(
+                                                    SnackBar(content: Text("Descrição atualizada!")),
+                                                  );
+                                                }
+                                              },
+                                              child: Text("Salvar"),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete, color: Colors.red),
+                                  onPressed: () async {
+                                    await LocationDatabase.deleteLocationById(loc.id!);
+                                    await _carregarLocalizacoes();
+                                    await _atualizarMarcadoresNoMapa();
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text("Localização removida.")),
+                                    );
+                                  },
+                                ),
+                              ],
+                            ),
                           );
                         }).toList(),
+
+
                         SizedBox(height: 50),
 
 
