@@ -3,6 +3,30 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/Check-Point.iml" filepath="$PROJECT_DIR$/.idea/Check-Point.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/android.iml" filepath="$PROJECT_DIR$/.idea/modules/android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.main.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/app/android.app.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/app/android.app.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.iml" filepath="$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1238184027/android.flutter_plugin_android_lifecycle.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.iml" filepath="$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1401011553/android.geolocator_android.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.iml" filepath="$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1220771490/android.mapbox_maps_flutter.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.iml" filepath="$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.androidTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.androidTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.unitTest.iml" filepath="$PROJECT_DIR$/.idea/modules/-1163605774/android.permission_handler_android.unitTest.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1636801046/gradle.iml" filepath="$PROJECT_DIR$/.idea/modules/-1636801046/gradle.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1636801046/gradle.main.iml" filepath="$PROJECT_DIR$/.idea/modules/-1636801046/gradle.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/-1636801046/gradle.test.iml" filepath="$PROJECT_DIR$/.idea/modules/-1636801046/gradle.test.iml" />
     </modules>
   </component>
 </project>
