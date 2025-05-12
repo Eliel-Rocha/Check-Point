@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:checkpointapp/BancoDeDados/Localizacoes.dart';
 
 String token = "pk.eyJ1IjoiZWxpZWxqdW5pb3IiLCJhIjoiY204M2R6d3N2MG1wMjJqb3Bvejg5M3c0cSJ9.tQgdHOalSYxxPusoxyMpFA";
 String urlStyle = "mapbox://styles/elieljunior/cm84uu252007n01qz8nxy5ds7";
@@ -19,6 +20,7 @@ class FullMap extends StatefulWidget {
 
 class FullMapState extends State<FullMap> {
   late final Future<geo.Position?> _posFuture;
+  final TextEditingController _descriptionController = TextEditingController();
 
   @override
   void initState() {
@@ -114,11 +116,43 @@ class FullMapState extends State<FullMap> {
           return const Center(child: Text("Não foi possível obter localização."));
         }
 
+        geo.Position pos = snap.data!;
+
         return Scaffold(
-          body: MapWidget(
-            key: const ValueKey("map"),
-            styleUri: urlStyle,
-            onMapCreated: (map) => _onMapCreated(map, snap.data),
+          body: Stack(
+            children: [
+              MapWidget(
+                key: const ValueKey("map"),
+                styleUri: urlStyle,
+                onMapCreated: (map) => _onMapCreated(map, pos),
+              ),
+              DraggableScrollableSheet(
+                initialChildSize: 0.4,
+                minChildSize: 0.2,
+                maxChildSize: 0.6,
+                builder: (context, scrollController) {
+                  return Container(
+                    color: Colors.white,
+                    child: ListView(
+                      controller: scrollController,
+                      padding: const EdgeInsets.all(16.0),
+                      children: [
+                        Text("Adicionar Localização"),
+                        TextField(
+                          controller: _descriptionController,
+                          decoration: const InputDecoration(labelText: "Descrição"),
+                        ),
+                        SizedBox(height: 16),
+                        ElevatedButton(
+                          onPressed: () => LocationDatabase.insertLocationGeo(pos, _descriptionController.text),
+                          child: const Text("Salvar Localização"),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         );
       },

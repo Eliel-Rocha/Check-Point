@@ -1,3 +1,4 @@
+import 'package:geolocator/geolocator.dart' as geo;
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
@@ -73,6 +74,20 @@ class LocationDatabase {
     await db.insert(
       'locations',
       location.toMap(),
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static Future<void> insertLocationGeo(geo.Position position, String description) async {
+    final db = await database;
+    await db.insert(
+      'locations',
+      {
+        'latitude': position.latitude,
+        'longitude': position.longitude,
+        'timestamp': DateTime.now().toIso8601String(),
+        'description': description
+      },
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
