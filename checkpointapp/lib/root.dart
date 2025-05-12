@@ -14,9 +14,9 @@ class RootPage extends StatefulWidget {
 }
 
 class RootPageState extends State<RootPage> {
-  late int tabIndex = 1;
+  late int tabIndex = 0;
   late PageController pageController;
-  final List<String> _titles = ['Perfil', 'Início', 'Mapa', 'Configurações'];
+  final List<String> _titles = ['Início','Perfil', 'Mapa', 'Configurações'];
   final List<Color> _colorBottomNav = UserPreferencesService.getThemeColor();
   final Color _colorTextAppBar = Colors.white;
 
@@ -61,20 +61,20 @@ class RootPageState extends State<RootPage> {
   @override
   Widget build(BuildContext context) {
     List<Map<String, dynamic>> items = [
-      {'icon': Icons.person, 'label': 'Perfil'},
       {'icon': Icons.home, 'label': 'Início'},
+      {'icon': Icons.person, 'label': 'Perfil'},
       {'icon': Icons.map, 'label': 'Mapa'},
       {'icon': Icons.settings, 'label': 'Configurações'}
     ];
 
     final List<Widget> _pages = [
+      TimelineScreen(),
       ProfileScreen(
         key: _profileKey,
         name: _profileName,
         imagePath: _profileImagePath,
         bio: _profileBio,
       ),
-      TimelineScreen(),
       FullMap(),
       ConfigPage(),
     ];
