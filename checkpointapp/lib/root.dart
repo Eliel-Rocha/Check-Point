@@ -95,17 +95,7 @@ class RootPageState extends State<RootPage> {
             ),
           ),
         ),
-        leading: tabIndex != 1
-            ? IconButton(
-          icon: Icon(Icons.arrow_back, color: _colorTextAppBar),
-          onPressed: () {
-            setState(() {
-              tabIndex = 1;
-            });
-            pageController.jumpToPage(tabIndex); // Move o PageView para a página correta
-          },
-        )
-            : null,
+
         title: Text(
           _titles[tabIndex],
           style: TextStyle(
@@ -114,7 +104,7 @@ class RootPageState extends State<RootPage> {
           ),
         ),
         centerTitle: true,
-        actions: tabIndex == 0
+        actions: tabIndex == 1
             ? [
           IconButton(
             icon: Icon(Icons.settings, color: _colorTextAppBar),
