@@ -77,16 +77,8 @@ class FullMapState extends State<FullMap> {
         coordinates: Position(loc.longitude, loc.latitude),
       );
 
-      final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
-      final Uint8List imageData = bytes.buffer.asUint8List();
 
-      final options = PointAnnotationOptions(
-        geometry: point,
-        image: imageData,
-        iconSize: 0.06, // Ajuste de tamanho
-      );
-
-      await _pointAnnotationManager!.create(options);
+      await _pointAnnotationManager!.create(await getoptions(point));
     }
     _ajustarCameraParaTodosOsPontos();
   }
@@ -197,6 +189,7 @@ class FullMapState extends State<FullMap> {
       await _carregarLocalizacoes();
       await _atualizarMarcadoresNoMapa();
     }
+
 
     _pointAnnotationManager =
     await mapboxMap.annotations.createPointAnnotationManager();
