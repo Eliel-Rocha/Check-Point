@@ -127,7 +127,7 @@ class FullMapState extends State<FullMap> {
     _posFuture = _initLocation();
     _requestPermissions();
     _checkLocationServices();
-    _carregarLocalizacoes();
+    //_carregarLocalizacoes();
   }
 
 
@@ -193,6 +193,9 @@ class FullMapState extends State<FullMap> {
           zoom: 16.0,
         ),
       );
+
+      await _carregarLocalizacoes();
+      await _atualizarMarcadoresNoMapa();
     }
 
     _pointAnnotationManager =
@@ -219,7 +222,7 @@ class FullMapState extends State<FullMap> {
     final Uint8List imageData = bytes.buffer.asUint8List();
 
     return PointAnnotationOptions(
-      geometry: Point(coordinates: Position(point.coordinates.lat, point.coordinates.lng)),
+      geometry: point,
       iconSize: 0.06,
       image: imageData,
     );
