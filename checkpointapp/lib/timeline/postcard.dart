@@ -1,7 +1,4 @@
-
 import 'package:checkpointapp/timeline/pagina_comentarios.dart';
-import 'package:checkpointapp/timeline/timeline.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class PostCard extends StatelessWidget {
@@ -28,6 +25,7 @@ class PostCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // Usuário
           Padding(
             padding: const EdgeInsets.all(10.0),
             child: Row(
@@ -52,9 +50,39 @@ class PostCard extends StatelessWidget {
               ],
             ),
           ),
-          Image.asset(post['image'], fit: BoxFit.cover, width: double.infinity),
+
+          // Conquista
           Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Expanded(
+                  child: Text(
+                    post['caption'],
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Padding(
+                  padding: const EdgeInsets.only(right: 20.0), // afasta da borda direita
+
+                  child: ClipOval(
+                    child: Image.asset(
+                      post['image'],
+                      width: 100,
+                      height: 100,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Ações
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -120,10 +148,6 @@ class PostCard extends StatelessWidget {
                 Text(post['time']),
               ],
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Text(post['caption']),
           ),
         ],
       ),
