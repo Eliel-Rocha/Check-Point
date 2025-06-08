@@ -28,8 +28,8 @@ class AuthService {
 
 
       return userCredential;
-    } on FirebaseAuthException catch (e) {
-      throw e;
+    } on FirebaseAuthException {
+      rethrow;
     } catch (e) {
       throw Exception('Erro durante o cadastro: $e');
     }
@@ -64,7 +64,7 @@ class AuthService {
           message: 'Esta conta foi desativada',
         );
       }
-      throw e;
+      rethrow;
     }
   }
 

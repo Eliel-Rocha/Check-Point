@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
-import 'package:checkpointapp/login/startpage.dart';
-
+import 'package:checkpointapp/Login/start_page.dart';
 
 class SettingsScreen extends StatefulWidget {
   final String initialName;
@@ -86,14 +84,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-
-
-
-
-
-
-
-
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
 
@@ -162,7 +152,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               onTap: _showImageSourceDialog,
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage: _imagePath != null ? FileImage(File(_imagePath!)) : null,
+                backgroundImage:
+                    _imagePath != null ? FileImage(File(_imagePath!)) : null,
                 child: _imagePath == null ? Icon(Icons.person, size: 50) : null,
               ),
             ),
@@ -184,53 +175,44 @@ class _SettingsScreenState extends State<SettingsScreen> {
               },
             ),
 
-
-
-
-
-
             //---------------logout---------------------------------------------------
             SizedBox(height: 20),
-            TextButton( // Usando TextButton para uma ação secundária em configurações
-                onPressed: () async {
-                  try {
-                    // Use a instância correta do AuthService
-                    final AuthService authService = AuthService();
-                    await authService.logout(); // metodo deslogar
+            TextButton(
+              // Usando TextButton para uma ação secundária em configurações
+              onPressed: () async {
+                try {
+                  // Use a instância correta do AuthService
+                  final AuthService authService = AuthService();
+                  await authService.logout(); // metodo deslogar
 
-
-                    // Navega para a tela inicial e remove todas as rotas anteriores
-                    // Isso acionará o AuthWrapper para navegar para a tela de login/cadastro
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(builder: (context) => StartPage()), // tela inicial
-                          (Route<dynamic> route) => false, // Remove todas as rotas
-                    );
-
-                  } catch (e) {
-                    print('Erro ao fazer logout: $e');
-                    // Mostrar um Snackbar ou AlertDialog para o usuário
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text('Erro ao fazer logout: $e'),
-                        backgroundColor: Colors.redAccent,
-                      ),
-                    );
-                  }
-                },
+                  // Navega para a tela inicial e remove todas as rotas anteriores
+                  // Isso acionará o AuthWrapper para navegar para a tela de login/cadastro
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => StartPage(),
+                    ), // tela inicial
+                    (Route<dynamic> route) => false, // Remove todas as rotas
+                  );
+                } catch (e) {
+                  print('Erro ao fazer logout: $e');
+                  // Mostrar um Snackbar ou AlertDialog para o usuário
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Erro ao fazer logout: $e'),
+                      backgroundColor: Colors.redAccent,
+                    ),
+                  );
+                }
+              },
               style: TextButton.styleFrom(
                 foregroundColor: Colors.red,
                 textStyle: TextStyle(fontSize: 18),
               ),
               child: Text('Sair'),
             ),
+
             //--------------------------------------fim do logout--------------------------------------------------
-
-
-
-
-
           ],
-
         ),
       ),
     );

@@ -1,10 +1,8 @@
 import 'dart:io';
-import 'package:checkpointapp/timeline/timeline.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'ConfiguracoesPerfil.dart';
-import 'Conquistas.dart';
-import 'GradeDeFotos.dart';
+import 'conquistas.dart';
+import 'grade_de_fotos.dart';
 
 class ProfileScreen extends StatefulWidget {
   final String name;
