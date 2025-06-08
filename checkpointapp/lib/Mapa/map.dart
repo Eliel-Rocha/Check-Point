@@ -108,7 +108,6 @@ class FullMapState extends State<FullMap> {
         await _pointAnnotationManager!.create(await getoptions(point));
       }
     }
-    //TODO: aquii!!
     _ajustarCameraParaTodosOsPontos();
   }
 
@@ -194,9 +193,6 @@ class FullMapState extends State<FullMap> {
     _pointAnnotationManager =
     await mapboxMap.annotations.createPointAnnotationManager();
 
-    // Carrega o ícone da imagem personalizada
-    final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
-    final Uint8List imageData = bytes.buffer.asUint8List();
 
     // Adiciona os marcadores com ícone
     for (var loc in _localizacoesSalvas) {
@@ -219,6 +215,29 @@ class FullMapState extends State<FullMap> {
       iconSize: 0.06,
       image: imageData,
     );
+  }
+
+
+  Future<void> _goToUserLocation() async {
+    try {
+      geo.Position position = await geo.Geolocator.getCurrentPosition(
+        desiredAccuracy: geo.LocationAccuracy.high,
+      );
+
+      if (_mapboxMap != null) {
+        _mapboxMap!.flyTo(
+          CameraOptions(
+            center: Point(coordinates: Position(position.longitude, position.latitude)),
+            zoom: 16.0,
+          ),
+          MapAnimationOptions(duration: 1000),
+        );
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao mover para localização atual: $e");
+      }
+    }
   }
 
 
@@ -250,13 +269,25 @@ class FullMapState extends State<FullMap> {
               ),
 
               Positioned(
-                  top: 40,
-                  left: 16,
-                  right: 16,
-                  child: LocationSearch(
-                  onResult: _moveToLocation,
-                  ),
+                top: 40,
+                left: 16,
+                right: 16,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: LocationSearch(onResult: _moveToLocation),
+                    ),
+                    const SizedBox(width: 8),
+                    FloatingActionButton(
+                      backgroundColor: Colors.white,
+                      mini: true,
+                      onPressed: _goToUserLocation,
+                      child: const Icon(Icons.my_location),
+                    ),
+                  ],
+                ),
               ),
+
 
               DraggableScrollableSheet(
                 initialChildSize: 0.4,
