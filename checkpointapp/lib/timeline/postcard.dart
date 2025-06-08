@@ -65,9 +65,9 @@ class PostCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Padding(
-                  padding: const EdgeInsets.only(right: 20.0), // afasta da borda direita
-
-                  child: ClipOval(
+                  padding: const EdgeInsets.only(right: 40.0),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.zero, // totalmente quadrada
                     child: Image.asset(
                       post['image'],
                       width: 100,
