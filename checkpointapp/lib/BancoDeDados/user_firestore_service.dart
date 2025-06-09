@@ -53,16 +53,6 @@ class UserFirestoreService {
     }
   }
 
-  Future<void> sendPasswordResetEmail(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email);
-    } on FirebaseAuthException catch (e) {
-      throw e;
-    } catch (e) {
-      throw Exception('Erro ao enviar email de redefinição: $e');
-    }
-  }
-
 /*-------------------------------Metodo para as conquitas obtidas--------------------*/
                            /*cada usuario tera suas propris conquistas*/
 

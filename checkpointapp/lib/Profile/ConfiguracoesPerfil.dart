@@ -4,6 +4,9 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
 import 'package:checkpointapp/login/startpage.dart';
+import 'package:checkpointapp/login/startpage.dart';
+
+import '../login/login_page.dart';
 
 
 class SettingsScreen extends StatefulWidget {
@@ -191,7 +194,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
             //---------------logout---------------------------------------------------
             SizedBox(height: 20),
-            TextButton( // Usando TextButton para uma ação secundária em configurações
+            TextButton(
                 onPressed: () async {
                   try {
                     // Use a instância correta do AuthService
@@ -225,11 +228,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             //--------------------------------------fim do logout--------------------------------------------------
 
+            SizedBox(height: 200),
+            TextButton(
+              onPressed: () async {
+                final TextEditingController emailController = TextEditingController();
+                final TextEditingController senhaController = TextEditingController();
+
+                // Mostra um dialog para o usuário inserir email e senha
+                await showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: Text('Confirmação'),
+                      content: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text('Digite seu e-mail e senha para confirmar a exclusão.'),
+                          TextField(
+                            controller: emailController,
+                            decoration: InputDecoration(labelText: 'E-mail'),
+                          ),
+                          TextField(
+                            controller: senhaController,
+                            decoration: InputDecoration(labelText: 'Senha'),
+                            obscureText: true,
+                          ),
+                        ],
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: Text('Cancelar'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            Navigator.of(context).pop(); // Fecha o diálogo
+                            try {
+                              final authService = AuthService();
+                              await authService.excluirConta(
+                                email: emailController.text.trim(),
+                                senha: senhaController.text.trim(),
+                              );
+
+                              // Redireciona imediatamente para a StartPage
+                              Navigator.pushAndRemoveUntil(
+                                context,
+                                MaterialPageRoute(builder: (context) => StartPage()),
+                                    (route) => false,
+                              );
+
+                            } catch (e) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('$e'),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          },
+                          child: Text('Confirmar'),
+                        ),
+
+                      ],
+                    );
+                  },
+                );
+              },
+              child: Text('Excluir Conta'),
+            )
 
 
 
 
           ],
+
 
         ),
       ),

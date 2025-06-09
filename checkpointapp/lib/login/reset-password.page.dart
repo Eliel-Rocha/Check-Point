@@ -3,6 +3,7 @@ import 'signup.page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
 import 'package:checkpointapp/sobre_o_app.dart';
+import 'package:checkpointapp/login/login_page.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   @override
@@ -15,6 +16,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final AuthService _authService = AuthService();
+  bool _loading = false;
+
 
   @override
   // Limpa os campos ao sair da tela
@@ -24,27 +27,41 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
     super.dispose();
   }
 
-  //***********função de reset de senha****************************************************************************************************************
-  /*void _sendResetEmail() async {
+  void _sendResetEmail() async {
     final email = _emailController.text.trim();
+
     if (email.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Informe um e-mail válido')),
       );
       return;
     }
+
+    setState(() => _loading = true);
+
     try {
-      sendPasswordResetEmail(email);
+      await _authService.enviarEmailDeRedefinicaoDeSenha(email: email);
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Email de redefinição enviado! Verifique sua caixa de entrada.')),
+        SnackBar(content: Text('Email enviado! Verifique sua caixa de entrada.')),
+      );
+
+      await Future.delayed(Duration(seconds: 2)); // Espera para o usuário ver a mensagem
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+            (Route<dynamic> route) => false,
       );
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Erro ao enviar o email: $e')),
       );
+    } finally {
+      setState(() => _loading = false);
     }
-  }*/
-//**************fim da função de reset de senha****************************************************************************************************************
+  }
+
+
 
 
   @override
@@ -145,8 +162,13 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                           ),
                         ),
                         child: SizedBox.expand(
-                          child: TextButton(
-                            child: Text(
+                          child:TextButton(
+                            onPressed: _loading ? null : _sendResetEmail,
+                            child: _loading
+                                ? CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                                : Text(
                               "Enviar",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -155,8 +177,8 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            onPressed: () {},
                           ),
+
                         ),
                       ),
                       SizedBox(
