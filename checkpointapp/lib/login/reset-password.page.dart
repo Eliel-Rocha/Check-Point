@@ -1,6 +1,52 @@
 import 'package:flutter/material.dart';
+import 'signup.page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:checkpointapp/BancoDeDados/auth_service.dart';
+import 'package:checkpointapp/sobre_o_app.dart';
 
-class ResetPasswordPage extends StatelessWidget {
+class ResetPasswordPage extends StatefulWidget {
+  @override
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+}
+
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+
+  @override
+  // Limpa os campos ao sair da tela
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  //***********função de reset de senha****************************************************************************************************************
+  /*void _sendResetEmail() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Informe um e-mail válido')),
+      );
+      return;
+    }
+    try {
+      sendPasswordResetEmail(email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Email de redefinição enviado! Verifique sua caixa de entrada.')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao enviar o email: $e')),
+      );
+    }
+  }*/
+//**************fim da função de reset de senha****************************************************************************************************************
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +112,7 @@ class ResetPasswordPage extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       TextFormField(
+                        controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: "E-mail",

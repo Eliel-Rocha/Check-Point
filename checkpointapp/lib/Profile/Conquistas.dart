@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart';
+
+import '../BancoDeDados/user_firestore_service.dart';
 
 class AchievementsGrid extends StatefulWidget {
   @override
@@ -6,107 +11,178 @@ class AchievementsGrid extends StatefulWidget {
 }
 
 class _AchievementsGridState extends State<AchievementsGrid> {
-  final List<Map<String, dynamic>> achievements = [
-    {
-      'title': 'Primeiro retaurante',
-      'description': 'Visite um Restaurante.',
-      'imagePath': 'assets/comida-e-restaurante.png',
-      'colorOne': Colors.green.shade900,
-      'colorTwo': Colors.green.shade300,
-    },
-    {
-      'title': 'Cinco Fotos',
-      'description': 'Adicionou cinco fotos ao álbum.',
-      'imagePath': 'assets/fotos.png',
-      'colorOne': Colors.green,
-      'colorTwo': Colors.lightGreen,
-    },
-    {
-      'title': 'Inicio da Jornada',
-      'description': 'Conhecer 3 cidades.',
-      'imagePath': 'assets/documento.png',
-      'colorOne': Colors.red,
-      'colorTwo': Colors.pink,
-    },
-    {
-      'title': 'Dez Curtidas',
-      'description': 'Recebeu dez curtidas em suas fotos.',
-      'imagePath': 'assets/coracao.png',
-      'colorOne': Colors.orange,
-      'colorTwo': Colors.deepOrange,
-    },
-    {
-      'title': 'Compartilhador',
-      'description': 'Compartilhou uma foto.',
-      'imagePath': 'assets/compartilhar.png',
-      'colorOne': Colors.purple,
-      'colorTwo': Colors.deepPurple,
-    },
-    {
-      'title': 'Mestre da Galeria',
-      'description': 'Adicionou 20 fotos ao álbum.',
-      'imagePath': 'assets/album.png',
-      'colorOne': Colors.teal,
-      'colorTwo': Colors.cyan,
-    },
-  ];
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+
+  List<Map<String, dynamic>> userAchievements = [];
+  bool isLoading = true;
 
   @override
-  Widget build(BuildContext context) {
-    return GridView.builder(
-      padding: EdgeInsets.all(10.0),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        mainAxisSpacing: 10.0,
-        crossAxisSpacing: 10.0,
-        childAspectRatio: 1.0,
-      ),
-      itemCount: achievements.length,
-      itemBuilder: (BuildContext context, int index) {
-        final achievement = achievements[index];
-        return Card(
-          elevation: 4.0,
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                ShaderMask(
-                  blendMode: BlendMode.srcATop,
-                  shaderCallback: (Rect bounds) {
-                    return LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        achievement['colorOne'],
-                        achievement['colorTwo'],
-                      ],
-                    ).createShader(bounds);
-                  },
-                  child: Image.asset(
-                    achievement['imagePath'],
-                    width: 48,
-                    height: 48,
+  void initState() {
+    super.initState();
+    carregarConquistasDoUsuario();
+  }
 
-                  ),
-                ),
-                SizedBox(height: 8),
-                Text(
-                  achievement['title'],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
-                ),
-                SizedBox(height: 4),
-                Text(
-                  achievement['description'],
-                  textAlign: TextAlign.center,
-                  style: TextStyle(fontSize: 13),
-                ),
-              ],
-            ),
-          ),
+
+  Future<void> testarConquistaPorLocalizacao() async {
+    try {
+      // Solicita a localização atual
+      Position posicaoAtual = await Geolocator.getCurrentPosition(desiredAccuracy: LocationAccuracy.high);
+      double latitudeAtual = posicaoAtual.latitude;
+      double longitudeAtual = posicaoAtual.longitude;
+
+      final userService = UserFirestoreService();
+
+      int? predioProximo = await userService.verificarProximidadeComPredios(
+        latitude: latitudeAtual,
+        longitude: longitudeAtual,
+        raioMetros: 50, // ajustar conforme necessário
+      );
+
+      if (predioProximo != null) {
+        await userService.adicionarPredioConquistado(predioProximo);
+        await carregarConquistasDoUsuario();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Conquista do prédio $predioProximo adicionada!')),
         );
-      },
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Nenhum prédio próximo encontrado.')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao obter localização: $e')),
+      );
+    }
+  }
+
+
+  Future<void> carregarConquistasDoUsuario() async {
+    try {
+      final userId = _auth.currentUser?.uid;
+      if (userId == null) throw Exception('Usuário não logado');
+
+      final usuarioDoc = await _db.collection('usuarios').doc(userId).get();
+      final dadosUsuario = usuarioDoc.data();
+
+      if (dadosUsuario == null || !dadosUsuario.containsKey('conquistas')) {
+        setState(() {
+          userAchievements = [];
+          isLoading = false;
+        });
+        return;
+      }
+
+      // Corrigido aqui: campo era 'Conquitas' errado + agora trata null
+      List<dynamic> prediosConquistados = dadosUsuario['conquistas'] ?? [];
+      List<Map<String, dynamic>> conquistas = [];
+
+
+      for (var predioId in prediosConquistados) {
+        final doc = await _db.collection('predios').doc(predioId.toString()).get();
+        if (doc.exists) {
+          var data = doc.data()!;
+          conquistas.add({
+            'title': data['predio']?.toString() ?? 'Prédio $predioId',
+            'description': data['conquista'] ?? data['descricao'] ?? '',
+            'icon': Icons.favorite,
+            'colorOne': Colors.pink,
+            'colorTwo': Colors.redAccent,
+          });
+        }
+      }
+
+      setState(() {
+        userAchievements = conquistas;
+        isLoading = false;
+      });
+    } catch (e) {
+      print('Erro ao carregar conquistas: $e');
+      setState(() {
+        userAchievements = [];
+        isLoading = false;
+      });
+    }
+  }
+
+
+  @override
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        isLoading
+            ? Center(child: CircularProgressIndicator())
+            : userAchievements.isEmpty
+            ? Center(child: Text('Nenhuma conquista encontrada'))
+            : GridView.builder(
+          padding: EdgeInsets.all(10.0),
+          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 10.0,
+            crossAxisSpacing: 10.0,
+            childAspectRatio: 1.0,
+          ),
+          itemCount: userAchievements.length,
+          itemBuilder: (BuildContext context, int index) {
+            final achievement = userAchievements[index];
+            return Card(
+              elevation: 4.0,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ShaderMask(
+                      blendMode: BlendMode.srcATop,
+                      shaderCallback: (Rect bounds) {
+                        return LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            achievement['colorOne'],
+                            achievement['colorTwo'],
+                          ],
+                        ).createShader(bounds);
+                      },
+                      child: Icon(
+                        achievement['icon'] as IconData,
+                        size: 48,
+                      )
+
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      achievement['title'],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      achievement['description'],
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 13),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
+        Positioned(
+          bottom: 20,
+          right: 20,
+          child: FloatingActionButton(
+            child: Icon(Icons.location_on),
+            onPressed: () async {
+              await testarConquistaPorLocalizacao();
+            },
+          ),
+        ),
+      ],
     );
   }
+
 }

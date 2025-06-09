@@ -12,7 +12,12 @@
           "package_name": "com.example.checkpointapp"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "297321674230-7s4ffloe9t0ve5cntgna00oi1h7nr154.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBh7qSfclgxvTmeUJiPlg215Enp3FPrPhA"
@@ -20,7 +25,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "297321674230-7s4ffloe9t0ve5cntgna00oi1h7nr154.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "297321674230-5s4kaa17j0cg8f7bittv3irtoc698s4r.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.checkpointapp"
+              }
+            }
+          ]
         }
       }
     }
