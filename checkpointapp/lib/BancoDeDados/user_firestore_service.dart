@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Para obter o ID do usuário logado
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:geolocator/geolocator.dart'; // Para obter o ID do usuário logado
 
 class UserFirestoreService {
   final FirebaseFirestore _db = FirebaseFirestore.instance;
@@ -52,7 +53,84 @@ class UserFirestoreService {
     }
   }
 
-//--------------------------------metodo de logout--------------------------------//
+/*-------------------------------Metodo para as conquitas obtidas--------------------*/
+                           /*cada usuario tera suas propris conquistas*/
+
+  // busca as conquitas, por predio
+  Future<List<int>> obterPrediosConquistados() async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) throw Exception('Usuário não está logado.');
+
+    final doc = await _db.collection('usuarios').doc(userId).get();
+    final data = doc.data();
+
+    if (data == null || !data.containsKey('conquistas')) {
+      return [];
+    }
+
+    return List<int>.from(data['conquistas']);
+  }
+
+  //metodo para adicionar conquistas
+  Future<void> adicionarPredioConquistado(int predioId) async {
+    final userId = _auth.currentUser?.uid;
+    if (userId == null) {
+      print('[ERRO] Usuário não está logado.');
+      throw Exception('Usuário não está logado.');
+    }
+
+    final userDocRef = _db.collection('usuarios').doc(userId);
+    final userSnapshot = await userDocRef.get();
+
+    if (!userSnapshot.exists) {
+      print('[ERRO] Documento do usuário não encontrado.');
+      throw Exception('Documento do usuário não encontrado.');
+    }
+
+    final data = userSnapshot.data() as Map<String, dynamic>? ?? {};
+    List<int> conquistasAtuais = [];
+
+    if (data.containsKey('conquistas') && data['conquistas'] != null) {
+      conquistasAtuais = List<int>.from(data['conquistas']);
+    }
+
+    if (conquistasAtuais.contains(predioId)) {
+      print('[INFO] Prédio $predioId já conquistado, não adicionando novamente.');
+      return;
+    }
+
+    // Adiciona a nova conquista
+    conquistasAtuais.add(predioId);
+
+    try {
+      // Se o campo não existia, ele será criado com merge:true
+      await userDocRef.set({'conquistas': conquistasAtuais}, SetOptions(merge: true));
+      print('[SUCESSO] Conquista do prédio $predioId adicionada ao usuário $userId.');
+    } catch (e) {
+      print('[ERRO] Falha ao atualizar conquistas: $e');
+      rethrow;
+    }
+  }
+
+
+  //para validar a conquitas
+  Future<int?> verificarProximidadeComPredios({required double latitude, required double longitude, double raioMetros = 50}) async {
+    final snapshot = await _db.collection('predios').get();
+
+    for (var doc in snapshot.docs) {
+      final data = doc.data();
+      if (data.containsKey('localizacao')) {
+        final geo = data['localizacao'] as GeoPoint;
+        final distancia = Geolocator.distanceBetween(latitude, longitude, geo.latitude, geo.longitude);
+        if (distancia <= raioMetros) {
+          return data['predio']; // Retorna o número do prédio
+        }
+      }
+    }
+    return null;
+  }
+//--------------fim dos metodos de conquistas-------------------------------------
+
 
 
 

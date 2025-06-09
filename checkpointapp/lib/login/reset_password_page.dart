@@ -1,6 +1,69 @@
 import 'package:flutter/material.dart';
+import 'signup.page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:checkpointapp/BancoDeDados/auth_service.dart';
+import 'package:checkpointapp/sobre_o_app.dart';
+import 'package:checkpointapp/login/login_page.dart';
 
-class ResetPasswordPage extends StatelessWidget {
+class ResetPasswordPage extends StatefulWidget {
+  @override
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+}
+
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _loading = false;
+
+
+  @override
+  // Limpa os campos ao sair da tela
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _sendResetEmail() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Informe um e-mail válido')),
+      );
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      await _authService.enviarEmailDeRedefinicaoDeSenha(email: email);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Email enviado! Verifique sua caixa de entrada.')),
+      );
+
+      await Future.delayed(Duration(seconds: 2)); // Espera para o usuário ver a mensagem
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+            (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao enviar o email: $e')),
+      );
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +129,7 @@ class ResetPasswordPage extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       TextFormField(
+                        controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: "E-mail",
@@ -98,8 +162,13 @@ class ResetPasswordPage extends StatelessWidget {
                           ),
                         ),
                         child: SizedBox.expand(
-                          child: TextButton(
-                            child: Text(
+                          child:TextButton(
+                            onPressed: _loading ? null : _sendResetEmail,
+                            child: _loading
+                                ? CircularProgressIndicator(
+                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            )
+                                : Text(
                               "Enviar",
                               style: TextStyle(
                                 fontWeight: FontWeight.bold,
@@ -108,8 +177,8 @@ class ResetPasswordPage extends StatelessWidget {
                               ),
                               textAlign: TextAlign.center,
                             ),
-                            onPressed: () {},
                           ),
+
                         ),
                       ),
                       SizedBox(

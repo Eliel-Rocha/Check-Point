@@ -59,7 +59,7 @@ class _CommentScreenState extends State<CommentScreen> {
               margin: const EdgeInsets.only(bottom: 10),
               decoration: BoxDecoration(
                 color: Colors.orange[300],
-                borderRadius: BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(100),
               ),
             ),
             const Text(

@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -68,10 +69,60 @@ class AuthService {
     }
   }
 
+  //RESETAR SENHA
+  Future<void> enviarEmailDeRedefinicaoDeSenha({
+    required String email})
+
+    async {
+    try {
+      await _auth.sendPasswordResetEmail(email: email);
+    } on FirebaseAuthException catch (e) {
+      throw e;
+    } catch (e) {
+      throw Exception('Erro ao enviar email de redefinição: $e');
+    }
+  }
+
+
   // LOGOUT
   Future<void> logout() async {
     await _auth.signOut();
   }
+
+  // EXCLUIR CONTA
+  Future<void> excluirConta({
+    required String email,
+    required String senha,
+  }) async {
+    try {
+      User? currentUser = _auth.currentUser;
+
+      if (currentUser != null) {
+        // Reautenticar o usuário
+        final credenciais = EmailAuthProvider.credential(email: email, password: senha);
+        await currentUser.reauthenticateWithCredential(credenciais);
+
+        // Excluir do Firestore
+        await _firestore.collection('usuarios').doc(currentUser.uid).delete();
+
+        // Excluir do Auth
+        await currentUser.delete();
+
+        print('Conta excluída com sucesso.');
+      } else {
+        throw Exception('Nenhum usuário logado para excluir.');
+      }
+    } on FirebaseAuthException catch (e) {
+      print('Erro ao excluir conta: ${e.code} - ${e.message}');
+      throw FirebaseAuthException(code: e.code, message: traduzirErro(e.code));
+    } catch (e) {
+      print('Erro inesperado ao excluir conta: $e');
+      throw Exception('Erro inesperado ao excluir conta: $e');
+    }
+  }
+
+
+
 
   // STREAM DE AUTENTICAÇÃO
   Stream<User?> get userChanges => _auth.authStateChanges();
