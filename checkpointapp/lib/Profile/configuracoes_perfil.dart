@@ -147,16 +147,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.only(
+          left: 16.0,
+          right: 16.0,
+          top: 16.0,
+          bottom: MediaQuery.of(context).viewInsets.bottom + 20,
+        ),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
               onTap: _showImageSourceDialog,
               child: CircleAvatar(
                 radius: 50,
                 backgroundImage:
-                    _imagePath != null ? FileImage(File(_imagePath!)) : null,
+                _imagePath != null ? FileImage(File(_imagePath!)) : null,
                 child: _imagePath == null ? Icon(Icons.person, size: 50) : null,
               ),
             ),
@@ -181,7 +187,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             //---------------logout---------------------------------------------------
             SizedBox(height: 20),
             TextButton(
-      // Usando TextButton para uma ação secundária em configurações
+              // Usando TextButton para uma ação secundária em configurações
 
               onPressed: () async {
                 try {
@@ -195,7 +201,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     MaterialPageRoute(
                       builder: (context) => StartPage(),
                     ), // tela inicial
-                    (Route<dynamic> route) => false, // Remove todas as rotas
+                        (Route<dynamic> route) => false, // Remove todas as rotas
                   );
                 } catch (e) {
                   print('Erro ao fazer logout: $e');
@@ -221,9 +227,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             TextButton(
               onPressed: () async {
                 final TextEditingController emailController =
-                    TextEditingController();
+                TextEditingController();
                 final TextEditingController senhaController =
-                    TextEditingController();
+                TextEditingController();
 
                 // Mostra um dialog para o usuário inserir email e senha
                 await showDialog (
@@ -270,11 +276,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                               // vai pra a StartPage
                               Navigator.of(
-                                context).pushAndRemoveUntil(
-                                MaterialPageRoute(
-                                  builder: (context) => StartPage(),
-                                ),
-                                  (route) => false
+                                  context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) => StartPage(),
+                                  ),
+                                      (route) => false
                               );
                             } catch (e) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -291,9 +297,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 );
-
-
-
               },
               child: Text('Excluir Conta'),
             ),
