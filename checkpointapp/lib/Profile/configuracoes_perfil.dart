@@ -1,11 +1,11 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
-import 'package:checkpointapp/login/startpage.dart';
 
 import '../login/login_page.dart';
+
+import 'package:checkpointapp/Login/start_page.dart';
 
 class SettingsScreen extends StatefulWidget {
   final String initialName;
@@ -181,6 +181,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
             //---------------logout---------------------------------------------------
             SizedBox(height: 20),
             TextButton(
+      // Usando TextButton para uma ação secundária em configurações
+
               onPressed: () async {
                 try {
                   // Use a instância correta do AuthService
@@ -213,13 +215,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Sair'),
             ),
 
-            //--------------------------------------fim do logout--------------------------------------------------
 
+            //--------------------------------------fim do logout--------------------------------------------------
             SizedBox(height: 200),
             TextButton(
               onPressed: () async {
-                final TextEditingController emailController = TextEditingController();
-                final TextEditingController senhaController = TextEditingController();
+                final TextEditingController emailController =
+                    TextEditingController();
+                final TextEditingController senhaController =
+                    TextEditingController();
 
                 // Mostra um dialog para o usuário inserir email e senha
                 await showDialog (
@@ -260,6 +264,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 email: emailController.text.trim(),
                                 senha: senhaController.text.trim(),
                               );
+
 
                               Navigator.of(context).pop();
 

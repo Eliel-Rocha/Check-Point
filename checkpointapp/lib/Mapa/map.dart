@@ -1,17 +1,16 @@
+import 'package:checkpointapp/Mapa/location_bottom_sheet.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mapbox_maps_flutter/mapbox_maps_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:geolocator/geolocator.dart' as geo;
-import 'package:checkpointapp/BancoDeDados/Localizacoes.dart';
+import 'package:checkpointapp/BancoDeDados/localizacoes.dart';
 import 'package:checkpointapp/Mapa/search_place.dart';
 
-String token = "pk.eyJ1IjoiZWxpZWxqdW5pb3IiLCJhIjoiY204M2R6d3N2MG1wMjJqb3Bvejg5M3c0cSJ9.tQgdHOalSYxxPusoxyMpFA";
+String token =
+    "pk.eyJ1IjoiZWxpZWxqdW5pb3IiLCJhIjoiY204M2R6d3N2MG1wMjJqb3Bvejg5M3c0cSJ9.tQgdHOalSYxxPusoxyMpFA";
 String urlStyle = "mapbox://styles/elieljunior/cm84uu252007n01qz8nxy5ds7";
-
-
-
 
 class FullMap extends StatefulWidget {
   const FullMap({super.key});
@@ -24,15 +23,15 @@ class FullMapState extends State<FullMap> {
   late final Future<geo.Position?> _posFuture;
   final TextEditingController _descriptionController = TextEditingController();
 
+  final ValueNotifier<double> _sheetOffset = ValueNotifier(
+    0.4,
+  ); // começa no initialChildSize
 
   void _moveToLocation(double lat, double lng) {
-    _mapboxMap?.setCamera(CameraOptions(
-      center: Point(coordinates: Position(lng, lat)),
-      zoom: 14.0,
-    ));
-
+    _mapboxMap?.setCamera(
+      CameraOptions(center: Point(coordinates: Position(lng, lat)), zoom: 14.0),
+    );
   }
-
 
   MapboxMap? _mapboxMap;
   PointAnnotationManager? _pointAnnotationManager;
@@ -42,18 +41,22 @@ class FullMapState extends State<FullMap> {
     if (_localizacoesSalvas.isEmpty || _mapboxMap == null) return;
 
     // Converte cada LocationModel (latitude/lng) em Point do Mapbox
-    final List<Point> pontos = _localizacoesSalvas.map((loc) {
-      return Point(coordinates: Position(loc.longitude, loc.latitude));
-    }).toList();
+    final List<Point> pontos =
+        _localizacoesSalvas.map((loc) {
+          return Point(coordinates: Position(loc.longitude, loc.latitude));
+        }).toList();
 
     try {
       // Calcula as opções de câmera que enquadram todos os pontos, com padding
-      final CameraOptions cameraOptions = await _mapboxMap!.cameraForCoordinates(
-        pontos,
-        MbxEdgeInsets.decode(80),  // margem interna para não colar nos cantos
-        0,                   // bearing (rotação) em graus
-        0,                   // pitch (inclinação) em graus
-      );
+      final CameraOptions cameraOptions = await _mapboxMap!
+          .cameraForCoordinates(
+            pontos,
+            MbxEdgeInsets.decode(
+              80,
+            ), // margem interna para não colar nos cantos
+            0, // bearing (rotação) em graus
+            0, // pitch (inclinação) em graus
+          );
 
       // Anima a câmera para esse enquadramento em 1,5s
       await _mapboxMap!.flyTo(
@@ -73,20 +76,14 @@ class FullMapState extends State<FullMap> {
     await _pointAnnotationManager!.deleteAll();
 
     for (var loc in _localizacoesSalvas) {
-      final point = Point(
-        coordinates: Position(loc.longitude, loc.latitude),
-      );
-
+      final point = Point(coordinates: Position(loc.longitude, loc.latitude));
 
       await _pointAnnotationManager!.create(await getoptions(point));
     }
     _ajustarCameraParaTodosOsPontos();
   }
 
-
-
   List<LocationModel> _localizacoesSalvas = [];
-
 
   Future<void> _carregarLocalizacoes() async {
     final localizacoes = await LocationDatabase.getAllLocations();
@@ -100,17 +97,13 @@ class FullMapState extends State<FullMap> {
       await _pointAnnotationManager!.deleteAll();
 
       for (var loc in localizacoes) {
-        final point = Point(
-          coordinates: Position(loc.longitude, loc.latitude),
-        );
-
+        final point = Point(coordinates: Position(loc.longitude, loc.latitude));
 
         await _pointAnnotationManager!.create(await getoptions(point));
       }
     }
     _ajustarCameraParaTodosOsPontos();
   }
-
 
   @override
   void initState() {
@@ -120,7 +113,6 @@ class FullMapState extends State<FullMap> {
     _checkLocationServices();
     //_carregarLocalizacoes();
   }
-
 
   Future<geo.Position?> _initLocation() async {
     final status = await Permission.location.request();
@@ -140,7 +132,6 @@ class FullMapState extends State<FullMap> {
       return null;
     }
   }
-
 
   Future<void> _requestPermissions() async {
     var status = await Permission.location.request();
@@ -163,18 +154,13 @@ class FullMapState extends State<FullMap> {
     }
   }
 
-
   Future<void> _onMapCreated(MapboxMap mapboxMap, geo.Position? pos) async {
     _mapboxMap = mapboxMap;
-
 
     await mapboxMap.loadStyleURI(urlStyle);
 
     await mapboxMap.location.updateSettings(
-      LocationComponentSettings(
-        enabled: true,
-        pulsingEnabled: true,
-      ),
+      LocationComponentSettings(enabled: true, pulsingEnabled: true),
     );
 
     if (pos != null) {
@@ -189,24 +175,19 @@ class FullMapState extends State<FullMap> {
       await _atualizarMarcadoresNoMapa();
     }
 
-
     _pointAnnotationManager =
-    await mapboxMap.annotations.createPointAnnotationManager();
-
+        await mapboxMap.annotations.createPointAnnotationManager();
 
     // Adiciona os marcadores com ícone
     for (var loc in _localizacoesSalvas) {
-      final point = Point(
-        coordinates: Position(loc.longitude, loc.latitude),
-      );
-
+      final point = Point(coordinates: Position(loc.longitude, loc.latitude));
 
       await _pointAnnotationManager?.create(await getoptions(point));
     }
     _ajustarCameraParaTodosOsPontos();
   }
 
-  Future<PointAnnotationOptions> getoptions(Point point) async{
+  Future<PointAnnotationOptions> getoptions(Point point) async {
     final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
     final Uint8List imageData = bytes.buffer.asUint8List();
 
@@ -217,7 +198,6 @@ class FullMapState extends State<FullMap> {
     );
   }
 
-
   Future<void> _goToUserLocation() async {
     try {
       geo.Position position = await geo.Geolocator.getCurrentPosition(
@@ -227,7 +207,9 @@ class FullMapState extends State<FullMap> {
       if (_mapboxMap != null) {
         _mapboxMap!.flyTo(
           CameraOptions(
-            center: Point(coordinates: Position(position.longitude, position.latitude)),
+            center: Point(
+              coordinates: Position(position.longitude, position.latitude),
+            ),
             zoom: 16.0,
           ),
           MapAnimationOptions(duration: 1000),
@@ -239,8 +221,6 @@ class FullMapState extends State<FullMap> {
       }
     }
   }
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -254,7 +234,9 @@ class FullMapState extends State<FullMap> {
           return const Center(child: CircularProgressIndicator());
         }
         if (snap.data == null) {
-          return const Center(child: Text("Não foi possível obter localização."));
+          return const Center(
+            child: Text("Não foi possível obter localização."),
+          );
         }
 
         geo.Position pos = snap.data!;
@@ -262,21 +244,21 @@ class FullMapState extends State<FullMap> {
         return Scaffold(
           body: Stack(
             children: [
+              // MAPA
               MapWidget(
                 key: const ValueKey("map"),
                 styleUri: urlStyle,
                 onMapCreated: (map) => _onMapCreated(map, pos),
               ),
 
+              // BARRA DE PESQUISA
               Positioned(
                 top: 40,
                 left: 16,
                 right: 16,
                 child: Row(
                   children: [
-                    Expanded(
-                      child: LocationSearch(onResult: _moveToLocation),
-                    ),
+                    Expanded(child: LocationSearch(onResult: _moveToLocation)),
                     const SizedBox(width: 8),
                     FloatingActionButton(
                       backgroundColor: Colors.white,
@@ -288,131 +270,99 @@ class FullMapState extends State<FullMap> {
                 ),
               ),
 
-
+              // BARRA DE LOCALIZAÇOES SALVAS
               DraggableScrollableSheet(
                 initialChildSize: 0.4,
                 minChildSize: 0.2,
                 maxChildSize: 0.6,
                 builder: (context, scrollController) {
-                  return Container(
-                    color: Colors.white,
-                    child: ListView(
-                      controller: scrollController,
-                      padding: const EdgeInsets.all(16.0),
-                      children: [
-                        Text("Adicionar Localização"),
-                        TextField(
-                          controller: _descriptionController,
-                          decoration: const InputDecoration(labelText: "Descrição"),
-                        ),
-                        SizedBox(height: 16),
-                        ElevatedButton(
-                          onPressed: () async {
-                            String descricao = _descriptionController.text.trim();
+                  return NotificationListener<DraggableScrollableNotification>(
+                    onNotification: (notification) {
+                      _sheetOffset.value = notification.extent;
+                      return true;
+                    },
+                    child: LocationBottomSheet(
+                      localizacoes: _localizacoesSalvas,
+                      descriptionController: _descriptionController,
+                      onAdd: (descricao) async {
+                        await LocationDatabase.insertLocationGeo(
+                          pos,
+                          descricao,
+                        );
+                        await _carregarLocalizacoes();
+                        await _atualizarMarcadoresNoMapa();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Localização salva com sucesso!"),
+                          ),
+                        );
+                      },
+                      onEdit: (loc, novaDesc) async {
+                        final novaLoc = LocationModel(
+                          id: loc.id,
+                          latitude: loc.latitude,
+                          longitude: loc.longitude,
+                          timestamp: loc.timestamp,
+                          description: novaDesc,
+                        );
+                        await LocationDatabase.updateLocation(novaLoc);
+                        await _carregarLocalizacoes();
+                        await _atualizarMarcadoresNoMapa();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Descrição atualizada!"),
+                          ),
+                        );
+                      },
+                      onDelete: (id) async {
+                        await LocationDatabase.deleteLocationById(id);
+                        await _carregarLocalizacoes();
+                        await _atualizarMarcadoresNoMapa();
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Localização removida."),
+                          ),
+                        );
+                      },
+                      scrollController: scrollController,
+                    ),
+                  );
+                },
+              ),
 
-                            if (descricao.isEmpty) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text("Por favor, insira uma descrição.")),
-                              );
-                              return;
-                            }
+              ValueListenableBuilder<double>(
+                valueListenable: _sheetOffset,
+                builder: (context, extent, child) {
+                  final screenHeight = MediaQuery.of(context).size.height;
+                  final sheetHeight = extent * screenHeight;
 
-                            await LocationDatabase.insertLocationGeo(pos, descricao);
-                            _descriptionController.clear();
+                  // Ajusta a posição do botão com base no topo da folha
+                  return Positioned(
+                    bottom:
+                        sheetHeight -
+                        20, // pode ajustar esse "-20" se quiser o botão mais colado
+                    right: 16,
+                    child: FloatingActionButton(
+                      backgroundColor: Colors.white,
+                      onPressed: () async {
+                        final location = await LocationDatabase.getLocationById(
+                          1,
+                        ); // troca o 24 pelo ID que quiser
 
-
-                            await _carregarLocalizacoes();
-                            await _atualizarMarcadoresNoMapa();
-
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text("Localização salva com sucesso!")),
-                            );
-                          },
-                          child: const Text("Salvar Localização"),
-                        ),
-
-
-                        SizedBox(height: 16),
-                        ..._localizacoesSalvas.map((loc) {
-                          return ListTile(
-                            title: Text(loc.description),
-                            subtitle: Text(
-                              'Lat: ${loc.latitude.toStringAsFixed(5)}, '
-                                  'Lng: ${loc.longitude.toStringAsFixed(5)}\n'
-                                  'Data: ${loc.timestamp.toLocal()}',
-                            ),
-                            isThreeLine: true,
-                            trailing: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                IconButton(
-                                  icon: Icon(Icons.edit, color: Colors.blue),
-                                  onPressed: () async {
-                                    final controller = TextEditingController(text: loc.description);
-
-                                    await showDialog(
-                                      context: context,
-                                      builder: (context) {
-                                        return AlertDialog(
-                                          title: Text("Editar Descrição"),
-                                          content: TextField(
-                                            controller: controller,
-                                            decoration: InputDecoration(hintText: "Nova descrição"),
-                                          ),
-                                          actions: [
-                                            TextButton(
-                                              onPressed: () => Navigator.pop(context),
-                                              child: Text("Cancelar"),
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                final novaDescricao = controller.text.trim();
-                                                if (novaDescricao.isNotEmpty) {
-                                                  final novaLoc = LocationModel(
-                                                    id: loc.id,
-                                                    latitude: loc.latitude,
-                                                    longitude: loc.longitude,
-                                                    timestamp: loc.timestamp,
-                                                    description: novaDescricao,
-                                                  );
-                                                  await LocationDatabase.updateLocation(novaLoc);
-                                                  Navigator.pop(context);
-                                                  await _carregarLocalizacoes();
-                                                  await _atualizarMarcadoresNoMapa();
-                                                  ScaffoldMessenger.of(context).showSnackBar(
-                                                    SnackBar(content: Text("Descrição atualizada!")),
-                                                  );
-                                                }
-                                              },
-                                              child: Text("Salvar"),
-                                            ),
-                                          ],
-                                        );
-                                      },
-                                    );
-                                  },
-                                ),
-                                IconButton(
-                                  icon: Icon(Icons.delete, color: Colors.red),
-                                  onPressed: () async {
-                                    await LocationDatabase.deleteLocationById(loc.id!);
-                                    await _carregarLocalizacoes();
-                                    await _atualizarMarcadoresNoMapa();
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(content: Text("Localização removida.")),
-                                    );
-                                  },
-                                ),
-                              ],
+                        if (location != null) {
+                          _moveToLocation(
+                            location.latitude,
+                            location.longitude,
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('Localização não encontrada'),
                             ),
                           );
-                        }).toList(),
-
-
-                        SizedBox(height: 50),
-
-
-                      ],
+                        }
+                      },
+                      child: const Icon(Icons.school_rounded),
                     ),
                   );
                 },

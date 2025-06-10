@@ -1,7 +1,7 @@
 import 'dart:async';
 
-import 'reset-password.page.dart';
-import 'signup.page.dart';
+import 'reset_password_page.dart';
+import 'signup_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
@@ -47,10 +47,12 @@ class _LoginPageState extends State<LoginPage> {
       print('Tentando login com: ${_emailController.text}');
 
       // Use o AuthService para fazer o login
-      final userCredential = await _authService.loginComEmailSenha(
-        email: _emailController.text.trim(),
-        senha: _passwordController.text,
-      ).timeout(Duration(seconds: 15));
+      final userCredential = await _authService
+          .loginComEmailSenha(
+            email: _emailController.text.trim(),
+            senha: _passwordController.text,
+          )
+          .timeout(Duration(seconds: 15));
 
       // Verifica se o e-mail foi verificado
       print('Login bem sucedido: ${userCredential.user?.uid}');
@@ -60,7 +62,7 @@ class _LoginPageState extends State<LoginPage> {
       // Navega para a tela de sobre o app
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => SobreoApp()),
-            (Route<dynamic> route) => false,
+        (Route<dynamic> route) => false,
       );
     }
     // Trata erros
@@ -104,10 +106,7 @@ class _LoginPageState extends State<LoginPage> {
       }
     }
   }
-//-----------------------fim da função de login--------------------------------------------------------------------------------
-
-
-
+  //-----------------------fim da função de login--------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +138,9 @@ class _LoginPageState extends State<LoginPage> {
               TextFormField(
                 //controler para pegar o valor do campo
                 controller: _emailController,
-                keyboardType: TextInputType.emailAddress, //keyboard para o teclado do celular
+                keyboardType:
+                    TextInputType
+                        .emailAddress, //keyboard para o teclado do celular
 
                 decoration: InputDecoration(
                   labelText: "E-mail",
@@ -149,7 +150,6 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 20,
                   ),
                 ),
-
 
                 //-----------validação do campo de e-mail------------------------------------------------------------------------------------------------
                 validator: (value) {
@@ -162,16 +162,15 @@ class _LoginPageState extends State<LoginPage> {
                   return null;
                 },
 
-
                 style: TextStyle(fontSize: 20),
               ),
               //------------------fim da validação do campo e do e-mail------------------------------------------------------------------------------------------------
 
-
               //-----------------------------------Senha------------------------------------------------------------------------------------------------
               SizedBox(height: 10),
               TextFormField(
-                controller: _passwordController,//controler para pegar o valor do campo
+                controller:
+                    _passwordController, //controler para pegar o valor do campo
                 obscureText: true,
                 decoration: InputDecoration(
                   labelText: "Senha",
@@ -181,7 +180,6 @@ class _LoginPageState extends State<LoginPage> {
                     fontSize: 20,
                   ),
                 ),
-
 
                 //------------validação do campo de senha-----------------------//
                 //validação do campo de senha
@@ -195,12 +193,10 @@ class _LoginPageState extends State<LoginPage> {
                   return null;
                 },
 
-
                 style: TextStyle(fontSize: 20),
               ),
+
               //--------------------fim da senha------------------------------------------------------------------------------------------------
-
-
               Container(
                 height: 40,
                 alignment: Alignment.centerRight,
@@ -234,29 +230,31 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 child: SizedBox.expand(
                   child: TextButton(
-
-
                     //-------------------------------função de login------------------------------------------------------------------------------------------------
                     onPressed: _isLoading ? null : _login,
+
                     //----------fima da função de login------------------------------------------------------------------------------------------------
-
-                    child: _isLoading
-                        ? CircularProgressIndicator(color: Colors.white)
-                        : Row(
-
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Login",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 20,
-                          ),
-                        ),
-                        Image.asset("assets/login-icon.png", height: 28, width: 28),
-                      ],
-                    ),
+                    child:
+                        _isLoading
+                            ? CircularProgressIndicator(color: Colors.white)
+                            : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: <Widget>[
+                                Text(
+                                  "Login",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                ),
+                                Image.asset(
+                                  "assets/login-icon.png",
+                                  height: 28,
+                                  width: 28,
+                                ),
+                              ],
+                            ),
                   ),
                 ),
               ),
@@ -290,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
                           height: 28,
                           width: 28,
                           child: Image.asset("assets/fb-icon.png"),
-                        )
+                        ),
                       ],
                     ),
                   ),

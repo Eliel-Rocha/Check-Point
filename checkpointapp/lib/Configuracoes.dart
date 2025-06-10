@@ -1,4 +1,4 @@
-import 'package:checkpointapp/BancoDeDados/UserPreferencesServices.dart';
+import 'package:checkpointapp/BancoDeDados/user_preferences_services.dart';
 import 'package:checkpointapp/root.dart';
 import 'package:checkpointapp/sobre_o_app.dart';
 import 'package:flutter/material.dart';
