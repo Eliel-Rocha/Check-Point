@@ -30,7 +30,7 @@ class UserFirestoreService {
       });
     } catch (e) {
       print('Erro ao salvar dados iniciais do usuário: $e');
-      throw e;
+      rethrow;
     }
   }
 
@@ -49,7 +49,7 @@ class UserFirestoreService {
       }
     } catch (e) {
       print('Erro ao obter dados do usuário: $e');
-      throw e;
+      rethrow;
     }
   }
 

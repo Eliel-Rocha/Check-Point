@@ -1,10 +1,7 @@
 import 'package:checkpointapp/root.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'BarraNavegacao.dart';
-import '../lib/Profile/TelaPerfil.dart';
-
-
+import 'barra_navegacao.dart';
 
 class FeedScreen extends StatefulWidget {
   @override

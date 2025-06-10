@@ -2,8 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
-import 'ImagemAmpliada.dart';
-import 'QuadradosDasFotos.dart';
+import 'imagem_ampliada.dart';
+import 'quadrados_das_fotos.dart';
 
 class PhotoGrid extends StatefulWidget {
   final List<String> photoPaths;
