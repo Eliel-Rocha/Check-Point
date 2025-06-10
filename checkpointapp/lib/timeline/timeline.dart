@@ -13,7 +13,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
 
   final List<Map<String, dynamic>> posts = List.generate(
     10,
-        (index) => {
+    (index) => {
       'username': 'Gabriela Adriana $index',
       'handle': '@gabiadriana$index',
       'image': 'assets/Chiquinha.jpg',
@@ -48,7 +48,6 @@ class _TimelineScreenState extends State<TimelineScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       body: ListView.builder(
         itemCount: posts.length,
         itemBuilder: (context, index) {

@@ -260,12 +260,6 @@ class FullMapState extends State<FullMap> {
                   children: [
                     Expanded(child: LocationSearch(onResult: _moveToLocation)),
                     const SizedBox(width: 8),
-                    FloatingActionButton(
-                      backgroundColor: Colors.white,
-                      mini: true,
-                      onPressed: _goToUserLocation,
-                      child: const Icon(Icons.my_location),
-                    ),
                   ],
                 ),
               ),
@@ -274,7 +268,7 @@ class FullMapState extends State<FullMap> {
               DraggableScrollableSheet(
                 initialChildSize: 0.4,
                 minChildSize: 0.2,
-                maxChildSize: 0.6,
+                maxChildSize: 0.8,
                 builder: (context, scrollController) {
                   return NotificationListener<DraggableScrollableNotification>(
                     onNotification: (notification) {
@@ -336,33 +330,25 @@ class FullMapState extends State<FullMap> {
                   final screenHeight = MediaQuery.of(context).size.height;
                   final sheetHeight = extent * screenHeight;
 
-                  // Ajusta a posição do botão com base no topo da folha
-                  return Positioned(
-                    bottom:
-                        sheetHeight -
-                        20, // pode ajustar esse "-20" se quiser o botão mais colado
-                    right: 16,
-                    child: FloatingActionButton(
-                      backgroundColor: Colors.white,
-                      onPressed: () async {
-                        final location = await LocationDatabase.getLocationById(
-                          1,
-                        ); // troca o 24 pelo ID que quiser
+                  // O botão desaparece quando a folha cobre mais de 60% da tela
+                  final bool isVisible = extent < 0.7 || extent > 0.3;
 
-                        if (location != null) {
-                          _moveToLocation(
-                            location.latitude,
-                            location.longitude,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Localização não encontrada'),
-                            ),
-                          );
-                        }
-                      },
-                      child: const Icon(Icons.school_rounded),
+                  return AnimatedPositioned(
+                    duration: const Duration(milliseconds: 100),
+                    curve: Curves.easeOut,
+                    bottom:
+                        isVisible
+                            ? sheetHeight - 20
+                            : -100, // some para fora da tela
+                    right: 16,
+                    child: AnimatedOpacity(
+                      duration: const Duration(milliseconds: 100),
+                      opacity: isVisible ? 1.0 : 0.0,
+                      child: FloatingActionButton(
+                        backgroundColor: Colors.white,
+                        onPressed: _goToUserLocation,
+                        child: const Icon(Icons.my_location),
+                      ),
                     ),
                   );
                 },
