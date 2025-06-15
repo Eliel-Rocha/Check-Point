@@ -1,4 +1,5 @@
 import 'package:checkpointapp/BancoDeDados/user_preferences_services.dart';
+import 'package:checkpointapp/BancoDeDados/user_firestore_service.dart'; // ADICIONADO
 import 'package:checkpointapp/timeline/timeline.dart';
 import 'package:circle_nav_bar/circle_nav_bar.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'configuracoes.dart';
 import 'Profile/configuracoes_perfil.dart';
 import 'Profile/tela_perfil.dart';
 import 'Mapa/map.dart';
+
 
 class RootPage extends StatefulWidget {
   @override
@@ -19,10 +21,20 @@ class RootPageState extends State<RootPage> {
   final List<Color> _colorBottomNav = UserPreferencesService.getThemeColor();
   final Color _colorTextAppBar = Colors.white;
 
-  // Dados do perfil compartilhados
+ /* // Dados do perfil compartilhados
   String _profileName = 'Nome_perfil';
   String? _profileImagePath;
+  String _profileBio = "";*/
+  // MODIFICADO: Inicializa as variáveis como vazias
+  String _profileName = '';
+  String? _profileImagePath;
   String _profileBio = "";
+  String _profileUsername = ''; // ADICIONADO: Variável para o username
+
+
+  // ADICIONADO: Serviço do Firestore e estado de carregamento
+  final UserFirestoreService _firestoreService = UserFirestoreService();
+  bool _isLoading = true;
 
   final GlobalKey<ProfileScreenState> _profileKey = GlobalKey();
 
@@ -30,6 +42,24 @@ class RootPageState extends State<RootPage> {
   void initState() {
     super.initState();
     pageController = PageController(initialPage: tabIndex);
+    _loadUserData();
+  }
+
+  // ADICIONADO: Método para carregar dados do usuário do Firestore
+  Future<void> _loadUserData() async {
+    final userData = await _firestoreService.getDadosUsuarioLogado();
+    if (mounted && userData != null) {
+      setState(() {
+        _profileName = userData['nome'] ?? 'Sem nome';
+        _profileBio = userData['bio'] ?? '';
+        _profileUsername = userData['username'] ?? 'sem_usuario'; // ADICIONADO: Carrega o username
+        _isLoading = false;
+      });
+    } else if (mounted) {
+      setState(() {
+        _isLoading = false;
+      });
+    }
   }
 
   void _openSettings() {
@@ -40,18 +70,30 @@ class RootPageState extends State<RootPage> {
           initialName: _profileName,
           initialImagePath: _profileImagePath,
           initialBio: _profileBio,
-          onSave: (newName, newImagePath, newBio) {
+        onSave: (newName, newImagePath, newBio) async {
+          try {
+            // 1. Salva no Firestore
+            await _firestoreService.atualizarDadosUsuario({
+              'nome': newName,
+              'bio': newBio,
+              // 'profileImageUrl': newImagePath, // Para quando implementar a imagem
+            });
+
+            // 2. Atualiza o estado local na RootPage (já fazia)
             setState(() {
               _profileName = newName;
               _profileImagePath = newImagePath;
               _profileBio = newBio;
             });
-            _profileKey.currentState?.updateProfile(
-              newName,
-              newImagePath,
-              newBio,
-            );
-          },
+
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text("Erro ao salvar: $e")),
+              );
+            }
+          }
+        },
         ),
       ),
     );
@@ -69,10 +111,10 @@ class RootPageState extends State<RootPage> {
     final List<Widget> _pages = [
       TimelineScreen(),
       ProfileScreen(
-        key: _profileKey,
-        name: _profileName,
-        imagePath: _profileImagePath,
-        bio: _profileBio,
+          name: _profileName,
+          imagePath: _profileImagePath,
+          bio: _profileBio,
+          username: _profileUsername,
       ),
       FullMap(),
       ConfigPage(),
@@ -113,7 +155,9 @@ class RootPageState extends State<RootPage> {
         ]
             : null,
       ),
-      body: PageView(
+      body:_isLoading
+          ? Center(child: CircularProgressIndicator())
+          : PageView(
         controller: pageController,
         physics: NeverScrollableScrollPhysics(),
         onPageChanged: (v) {

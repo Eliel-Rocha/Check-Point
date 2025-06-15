@@ -4,66 +4,73 @@ import 'package:image_picker/image_picker.dart';
 import 'conquistas.dart';
 import 'grade_de_fotos.dart';
 
+
 class ProfileScreen extends StatefulWidget {
   final String name;
-  final String? imagePath;
   final String bio;
+  final String username;
+  final String? imagePath;
 
   ProfileScreen({
     Key? key,
     required this.name,
-    this.imagePath,
     required this.bio,
+    required this.username,
+    this.imagePath,
   }) : super(key: key);
-
-
 
   @override
   ProfileScreenState createState() => ProfileScreenState();
 }
 
 class ProfileScreenState extends State<ProfileScreen> {
+  // Constantes de Cor
   static const Color sunsetOrange = Color(0xFFFF9933);
   static const Color sunsetPurple = Color(0xFF663399);
   static const Color sunsetYellow = Color(0xFFFFCC33);
   static const Color sunsetLightOrange = Color(0xFFFFB366);
   static const Color sunsetDarkPurple = Color(0xFF4D2973);
 
+  // Estado interno da UI da tela
   bool _isShowingAlbum = true;
-  String _profileName = 'Nome_perfil';
-  String? _profileImagePath;
-  String _profileBio = "";
+  late String _profileName;
+  late String _profileBio;
+  late String _profileUsername;
+  late String? _profileImagePath;
+
+  // Variáveis para a galeria de fotos local
   List<String> _photoPaths = [];
   List<bool> _likes = [];
   final ImagePicker _picker = ImagePicker();
 
-  void updateProfile(String name, String? imagePath, String bio) {
-    setState(() {
-      _profileName = name;
-      _profileImagePath = imagePath;
-      _profileBio = bio;
-    });
+  @override
+  void initState() {
+    super.initState();
+    // Inicializa o estado interno com os dados recebidos da root.dart
+    _profileName = widget.name;
+    _profileBio = widget.bio;
+    _profileUsername = widget.username;
+    _profileImagePath = widget.imagePath;
   }
 
-
-  void _updateProfileName(String newName) {
-    setState(() {
-      _profileName = newName;
-    });
+  // Garante que a tela se atualize se os dados na root.dart mudarem
+  @override
+  void didUpdateWidget(covariant ProfileScreen oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.name != oldWidget.name ||
+        widget.bio != oldWidget.bio ||
+        widget.username != oldWidget.username ||
+        widget.imagePath != oldWidget.imagePath) {
+      setState(() {
+        _profileName = widget.name;
+        _profileBio = widget.bio;
+        _profileUsername = widget.username;
+        _profileImagePath = widget.imagePath;
+      });
+    }
   }
 
-  void _updateProfileImage(String? newImagePath) {
-    setState(() {
-      _profileImagePath = newImagePath;
-    });
-  }
-
-  void _updateProfileBio(String newBio) {
-    setState(() {
-      _profileBio = newBio;
-    });
-  }
-
+  // Métodos para a galeria de fotos local (sem conexão com banco de dados ainda)
   void _addPhoto(String path) {
     setState(() {
       _photoPaths.add(path);
@@ -84,6 +91,16 @@ class ProfileScreenState extends State<ProfileScreen> {
     });
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await _picker.pickImage(source: source);
+    if (pickedFile != null) {
+      setState(() {
+        _profileImagePath = pickedFile.path;
+        // Futuramente, esta ação também chamaria um método para salvar
+        // a imagem no Firebase Storage e atualizar a URL no Firestore.
+      });
+    }
+  }
 
   Future<void> _showImageSourceDialog() async {
     await showDialog(
@@ -91,7 +108,6 @@ class ProfileScreenState extends State<ProfileScreen> {
       builder: (BuildContext context) {
         return AlertDialog(
           title: Text('Selecionar Imagem'),
-          content: Text('De onde você quer selecionar a imagem?'),
           actions: <Widget>[
             TextButton(
               child: Text('Câmera'),
@@ -107,61 +123,10 @@ class ProfileScreenState extends State<ProfileScreen> {
                 Navigator.of(context).pop();
               },
             ),
-            if (_profileImagePath != null)
-              TextButton(
-                child: Text('Excluir'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                  _showDeleteConfirmationDialog();
-                },
-              ),
           ],
         );
       },
     );
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-
-    if (pickedFile != null) {
-      setState(() {
-        _profileImagePath = pickedFile.path;
-      });
-    }
-  }
-
-  void _showDeleteConfirmationDialog() {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Excluir Imagem'),
-          content: Text('Você tem certeza que deseja excluir esta imagem?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancelar'),
-            ),
-            TextButton(
-              onPressed: () {
-                _deleteProfileImage();
-                Navigator.of(context).pop();
-              },
-              child: Text('Excluir'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _deleteProfileImage() {
-    setState(() {
-      _profileImagePath = null;
-    });
   }
 
   @override
@@ -203,17 +168,16 @@ class ProfileScreenState extends State<ProfileScreen> {
                           child: SizedBox(
                             width: 90,
                             height: 90,
-                            child:
-                                _profileImagePath != null
-                                    ? Image.file(
-                                      File(_profileImagePath!),
-                                      fit: BoxFit.cover,
-                                    )
-                                    : Icon(
-                                      Icons.person,
-                                      size: 60,
-                                      color: Colors.grey,
-                                    ),
+                            child: _profileImagePath != null
+                                ? Image.file(
+                              File(_profileImagePath!),
+                              fit: BoxFit.cover,
+                            )
+                                : Icon(
+                              Icons.person,
+                              size: 60,
+                              color: Colors.grey,
+                            ),
                           ),
                         ),
                       ),
@@ -221,20 +185,23 @@ class ProfileScreenState extends State<ProfileScreen> {
                   ),
                 ),
               ),
+              SizedBox(height: 12),
               Text(
                 _profileName,
                 style: TextStyle(
                   fontFamily: 'Inter',
                   color: sunsetDarkPurple,
-                  letterSpacing: 0.0,
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
+              SizedBox(height: 4),
               Text(
-                '@_do_perfil',
+                '@$_profileUsername',
                 style: TextStyle(
                   fontFamily: 'Inter',
-                  color: sunsetPurple,
-                  letterSpacing: 0.0,
+                  color: Colors.grey.shade600,
+                  fontSize: 16,
                 ),
               ),
               Padding(
@@ -264,13 +231,15 @@ class ProfileScreenState extends State<ProfileScreen> {
                       },
                       child: Column(
                         children: [
-                          Icon(Icons.photo_album, color: sunsetOrange),
+                          Icon(Icons.photo_album,
+                              color:
+                              _isShowingAlbum ? sunsetOrange : Colors.grey),
                           Text(
                             'Álbum',
                             style: TextStyle(
                               fontFamily: 'Inter',
-                              color: sunsetOrange,
-                              letterSpacing: 0.0,
+                              color:
+                              _isShowingAlbum ? sunsetOrange : Colors.grey,
                             ),
                           ),
                         ],
@@ -286,13 +255,15 @@ class ProfileScreenState extends State<ProfileScreen> {
                       },
                       child: Column(
                         children: [
-                          Icon(Icons.star, color: sunsetYellow),
+                          Icon(Icons.star,
+                              color:
+                              !_isShowingAlbum ? sunsetYellow : Colors.grey),
                           Text(
                             'Medalhas',
                             style: TextStyle(
                               fontFamily: 'Inter',
-                              color: sunsetYellow,
-                              letterSpacing: 0.0,
+                              color:
+                              !_isShowingAlbum ? sunsetYellow : Colors.grey,
                             ),
                           ),
                         ],
@@ -302,16 +273,15 @@ class ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               Expanded(
-                child:
-                    _isShowingAlbum
-                        ? PhotoGrid(
-                          photoPaths: _photoPaths,
-                          likes: _likes,
-                          addPhoto: _addPhoto,
-                          removePhoto: _removePhoto,
-                          toggleLike: _toggleLike,
-                        )
-                        : AchievementsGrid(),
+                child: _isShowingAlbum
+                    ? PhotoGrid(
+                  photoPaths: _photoPaths,
+                  likes: _likes,
+                  addPhoto: _addPhoto,
+                  removePhoto: _removePhoto,
+                  toggleLike: _toggleLike,
+                )
+                    : AchievementsGrid(),
               ),
             ],
           ),
@@ -320,4 +290,3 @@ class ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
-

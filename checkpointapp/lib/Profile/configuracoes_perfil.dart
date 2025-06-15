@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:checkpointapp/BancoDeDados/auth_service.dart';
-
 import '../login/login_page.dart';
 
 import 'package:checkpointapp/Login/start_page.dart';

@@ -1,3 +1,4 @@
+import 'package:checkpointapp/BancoDeDados/user_firestore_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -11,22 +12,41 @@ class AuthService {
   factory AuthService() => _instance;
   AuthService._internal();
 
+
   // CADASTRO COMPLETO (Auth + Firestore)
   Future<UserCredential> cadastrarComEmailSenha({
     required String email,
     required String senha,
     required String nome,
+    required String username,
   }) async {
     try {
-      // 1. Cria usuário no Auth (senha fica aqui)
+      // 1. Cria usuário no Auth
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: senha,
       );
 
-      // 2. Atualiza nome no perfil do Auth
       await userCredential.user?.updateDisplayName(nome);
 
+      if (userCredential.user != null) {
+        final firestoreService = UserFirestoreService();
+        final userId = userCredential.user!.uid;
+        final usernameLower = username.toLowerCase();
+
+        // 2. Salva os dados na coleção 'usuarios' (como antes)
+        await firestoreService.salvarDadosIniciaisUsuario(
+          userId: userId,
+          nome: nome,
+          email: email,
+          username: username, // Note que aqui ainda usamos o original para exibição
+        );
+
+        // 3. ADICIONADO: Reserva o nome de usuário na coleção pública 'usernames'
+        await _firestore.collection('usernames').doc(usernameLower).set({
+          'userId': userId,
+        });
+      }
 
       return userCredential;
     } on FirebaseAuthException {
@@ -35,7 +55,6 @@ class AuthService {
       throw Exception('Erro durante o cadastro: $e');
     }
   }
-
   // LOGIN (Mantém seguro no Auth)
   Future<UserCredential> loginComEmailSenha({
     required String email,
@@ -98,17 +117,36 @@ class AuthService {
       User? currentUser = _auth.currentUser;
 
       if (currentUser != null) {
-        // Reautenticar o usuário
+        // Reautenticar o usuário para confirmar a identidade
         final credenciais = EmailAuthProvider.credential(email: email, password: senha);
         await currentUser.reauthenticateWithCredential(credenciais);
 
-        // Excluir do Firestore
-        await _firestore.collection('usuarios').doc(currentUser.uid).delete();
+        // --- INÍCIO DA LÓGICA ATUALIZADA ---
 
-        // Excluir do Auth
+        final userDocRef = _firestore.collection('usuarios').doc(currentUser.uid);
+        final userDoc = await userDocRef.get();
+
+        // 1. Pega o username do perfil antes de apagar
+        if (userDoc.exists) {
+          final username = userDoc.data()?['username'];
+
+          // 2. Apaga o documento de reserva da coleção 'usernames'
+          if (username != null && username.isNotEmpty) {
+            await _firestore.collection('usernames').doc(username.toLowerCase()).delete();
+            print('Reserva de username removida com sucesso.');
+          }
+        }
+
+        // 3. Apaga o documento principal do usuário da coleção 'usuarios'
+        await userDocRef.delete();
+
+        // --- FIM DA LÓGICA ATUALIZADA ---
+
+        // 4. Apaga o usuário do sistema de Autenticação
         await currentUser.delete();
 
-        print('Conta excluída com sucesso.');
+        print('Conta completamente excluída com sucesso.');
+
       } else {
         throw Exception('Nenhum usuário logado para excluir.');
       }

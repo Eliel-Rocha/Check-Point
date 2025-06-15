@@ -15,6 +15,7 @@ class _SignupPageState extends State<SignupPage> {
   final _nomeController = TextEditingController();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
+  final _usernameController = TextEditingController(); // ADICIONADO: Controller para o username
 
   final AuthService _authService = AuthService();
   final UserFirestoreService _userFirestoreService = UserFirestoreService();
@@ -29,63 +30,59 @@ class _SignupPageState extends State<SignupPage> {
 
 
   //----------------------função de cadastro------------------------------------------------------------------------------------------------
+  // MODIFICADO: Função de cadastro agora verifica o username
   Future<void> _cadastrarUsuario() async {
-    if (_formKey.currentState?.validate() ?? false) {
+    if (!(_formKey.currentState?.validate() ?? false)) return;
+
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      final usernameDesejado = _usernameController.text.trim();
+
+      bool isAvailable = await _userFirestoreService.isUsernameAvailable(usernameDesejado);
+      if (!mounted) return;
+
+      if (!isAvailable) {
+        setState(() {
+          _errorMessage = 'Este nome de usuário já está em uso.';
+          _isLoading = false;
+        });
+        return;
+      }
+
+      final userCredential = await _authService.cadastrarComEmailSenha(
+        email: _emailController.text.trim(),
+        senha: _senhaController.text.trim(),
+        nome: _nomeController.text.trim(),
+        username: usernameDesejado,
+      );
+
+      await userCredential.user?.sendEmailVerification();
       setState(() {
-        _isLoading = true;
-        _errorMessage = null;
-      });
-
-      try {
-        debugPrint('Iniciando cadastro...');
-
-        final userCredential = await _authService.cadastrarComEmailSenha(
-          email: _emailController.text.trim(),
-          senha: _senhaController.text.trim(),
-          nome: _nomeController.text.trim(),
-        );
-
-        await userCredential.user?.sendEmailVerification();
-
         _usuarioCadastrado = true;
         _usuarioAtual = userCredential.user;
+      });
 
-        await showDialog(
-          context: context,
-          builder: (_) => AlertDialog(
-            title: Text('Verifique seu e-mail'),
-            content: Text('Enviamos um link de verificação para o seu e-mail. Clique nele para ativar sua conta.'),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text('OK'),
-              ),
-            ],
-          ),
-        );
+      await showDialog(
+        context: context,
+        builder: (_) => AlertDialog(
+          title: Text('Verifique seu e-mail'),
+          content: Text('Enviamos um link de verificação para o seu e-mail.'),
+          actions: [
+            TextButton(onPressed: () => Navigator.of(context).pop(), child: Text('OK')),
+          ],
+        ),
+      );
 
-        if (userCredential.user?.uid != null) {
-          await _userFirestoreService.salvarDadosIniciaisUsuario(
-            userId: userCredential.user!.uid,
-            nome: _nomeController.text.trim(),
-            email: _emailController.text.trim(),
-          );
-          debugPrint('Dados salvos no Firestore');
-        }
-
-      } on FirebaseAuthException catch (e) {
-        debugPrint('Erro no cadastro: ${e.code}');
-        setState(() {
-          _errorMessage = _authService.traduzirErro(e.code);
-        });
-      } catch (e) {
-        debugPrint('Erro geral: $e');
-        setState(() {
-          _errorMessage = 'Erro ao cadastrar: $e';
-        });
-      } finally {
-        setState(() => _isLoading = false);
-      }
+    } on FirebaseAuthException catch (e) {
+      setState(() => _errorMessage = _authService.traduzirErro(e.code));
+    } catch (e) {
+      setState(() => _errorMessage = 'Erro ao cadastrar: $e');
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
   }
   //----------------------fim da função de cadastro------------------------------------------------------------------------------------------------
@@ -125,8 +122,9 @@ class _SignupPageState extends State<SignupPage> {
   //--------------------------fim da função de verificar email------------------------------------------------------------------------------------------------
 
   @override
-  void dispose() {//limpa os campos ao sair da tela
+  void dispose() {
     _nomeController.dispose();
+    _usernameController.dispose();
     _emailController.dispose();
     _senhaController.dispose();
     super.dispose();
@@ -190,19 +188,32 @@ class _SignupPageState extends State<SignupPage> {
                 //------------------Email----------------------//
                 SizedBox(height: 20),
                 TextFormField(
-                  controller: _nomeController,
-                  validator: (value) => value!.isEmpty ? 'Informe seu nome' : null,
-                  decoration: InputDecoration(
-                    labelText: "Nome",
-                    labelStyle: TextStyle(
-                      color: Colors.black38,
-                      fontWeight: FontWeight.w400,
-                      fontSize: 20,
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      labelText: "Nome de Usuário",
+                      hintText: "ex: seu_nome_123",
+                      prefixText: "@", // Prefixo para indicar que é um handle
+                      labelStyle: TextStyle(
+                        color: Colors.black38,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 20,
+                      ),
                     ),
-                  ),
+                  // Validador para o nome de usuário
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Por favor, crie um nome de usuário.';
+                    }
+                    if (value.contains(' ') || value.contains('@')) {
+                      return 'Não pode conter espaços ou @';
+                    }
+                    if (value.length < 4) {
+                      return 'Mínimo de 4 caracteres';
+                    }
+                    return null;
+                  },
                   style: TextStyle(fontSize: 20),
                 ),
-
                 SizedBox(height: 10),
 
                 //------------------verificar email----------------------//
