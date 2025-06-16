@@ -63,10 +63,10 @@ O projeto **CheckPoint** se alinha a alguns dos Objetivos de Desenvolvimento Sus
 
 ### 🏙️ ODS 11 – Cidades e Comunidades Sustentáveis  
 **Tornar as cidades e os assentamentos humanos inclusivos, seguros, resilientes e sustentáveis.**  
-> Ao promover o reconhecimento de pontos culturais e locais de interesse dentro da universidade, o CheckPoint contribui para a valorização do espaço urbano educacional, incentivando a mobilidade a pé e a apropriação responsável dos espaços.
+> Ao promover o reconhecimento de pontos culturais e locais de interesse dentro da universidade, o CheckPoint contribui para a valorização do espaço sustentável educacional.
 
 
-> Saiba mais sobre os ODS: [https://brasil.un.org/pt-br/sdgs](https://brasil.un.org/pt-br/sdgs)
+Saiba mais sobre os ODS: [https://brasil.un.org/pt-br/sdgs](https://brasil.un.org/pt-br/sdgs)
 
 ---
 
