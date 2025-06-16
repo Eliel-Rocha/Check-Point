@@ -52,9 +52,9 @@ Respositorio:.
 │
 └───checkpointapp	// Pasta de Desenvolvimento
     │
-	├───assets		// Imagems do aplictivo
+    ├───assets		// Imagems do aplictivo
     │
-	│       album.png
+    │       album.png
     │       CheckPoint.png
     │       Chiquinha.jpg
     │       circulos.png
@@ -114,11 +114,9 @@ Respositorio:.
     ├───ios 			// Programa para IOS
     │
     ├───android 		// Programa para android
-	  │
-	  └─── pubspec.yaml 	// Arquivo de configurações pricipal
+    │
+    └─── pubspec.yaml 		// Arquivo de configurações pricipal
 	
-    
-
 
 ```
 ---
