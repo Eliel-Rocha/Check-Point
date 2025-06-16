@@ -19,6 +19,7 @@ O **CheckPoint** é um app que permite aos usuários:
 
 - **Flutter** — Framework principal
 - **Dart** — Linguagem de programação
+- **SQLite** — Banco de dados local
 - **Firebase Auth & Firestore** — Autenticação e banco de dados em nuvem
 - **Mapbox** — Exibição e marcação de locais no mapa
 - **Geolocator / Permission Handler** — Acesso à localização
