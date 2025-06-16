@@ -87,9 +87,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
           conquistas.add({
             'title': data['predio']?.toString() ?? 'Prédio $predioId',
             'description': data['conquista'] ?? data['descricao'] ?? '',
-            'icon': Icons.favorite,
-            'colorOne': Colors.pink,
-            'colorTwo': Colors.redAccent,
+            'imagePath': data['imagem'] ?? 'assets/CheckPoint.png'
           });
         }
       }
@@ -135,23 +133,13 @@ class _AchievementsGridState extends State<AchievementsGrid> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    ShaderMask(
-                      blendMode: BlendMode.srcATop,
-                      shaderCallback: (Rect bounds) {
-                        return LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            achievement['colorOne'],
-                            achievement['colorTwo'],
-                          ],
-                        ).createShader(bounds);
+                    Image.asset(
+                      achievement['imagePath'],
+                      height: 80,
+                      errorBuilder: (context, error, stackTrace) {
+                        // Se a imagem não for encontrada no caminho especificado, mostra um ícone de erro
+                        return Icon(Icons.error_outline, size: 80, color: Colors.red);
                       },
-                      child: Icon(
-                        achievement['icon'] as IconData,
-                        size: 48,
-                      )
-
                     ),
                     SizedBox(height: 8),
                     Text(
