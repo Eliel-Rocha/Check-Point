@@ -148,3 +148,31 @@ class UserFirestoreService {
   }
 
 }
+
+//-----------------Time line-----------------------
+class TimelineService {
+  final _db = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
+  Future<void> publicarConquistaNaTimeline(String tituloConquista) async {
+    final user = _auth.currentUser;
+    if (user == null) return;
+
+    final usuarioDoc = await _db.collection('usuarios').doc(user.uid).get();
+    final nomeUsuario = usuarioDoc.data()?['nome'] ?? 'Usuário';
+
+    final novoPost = {
+      'username': nomeUsuario,
+      'userId': user.uid,
+      'caption': 'Acabei de conquistar: $tituloConquista! 🏆',
+      'likes': 0,
+      'likedBy': [],
+      'commentsNum': 0,
+      'comments': [],
+      'image': 'assets/CheckPoint.png', // imagem default de conquista
+      'timestamp': FieldValue.serverTimestamp()
+    };
+
+    await _db.collection('timeline_posts').add(novoPost);
+  }
+}

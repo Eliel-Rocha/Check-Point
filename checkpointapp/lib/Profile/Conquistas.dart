@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 
+
 import '../BancoDeDados/user_firestore_service.dart';
 
 class AchievementsGrid extends StatefulWidget {
@@ -41,6 +42,16 @@ class _AchievementsGridState extends State<AchievementsGrid> {
 
       if (predioProximo != null) {
         await userService.adicionarPredioConquistado(predioProximo);
+
+        // Obtem dados do prédio para o post
+        final predioDoc = await _db.collection('predios').doc(predioProximo.toString()).get();
+        final nomeConquista = predioDoc.data()?['predio']?.toString() ?? 'Prédio $predioProximo';
+
+        // Publica na timeline
+        final timelineService = TimelineService();
+        await timelineService.publicarConquistaNaTimeline(nomeConquista);
+
+        // Atualiza UI
         await carregarConquistasDoUsuario();
 
         ScaffoldMessenger.of(context).showSnackBar(
