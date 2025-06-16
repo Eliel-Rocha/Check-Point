@@ -27,16 +27,16 @@ O **CheckPoint** é um app que permite aos usuários:
 ## ⚙️ Como rodar o projeto
 
 1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seu-usuario/checkpoint.git
-   cd checkpoint/checkpointapp
-   ```
-   
-2. Va para a pasta chechpoint app instale as dependências e execute o aplicativo:
 ```bash
-  flutter pub get
-  flutter run
-   ```
+git clone https://github.com/seu-usuario/checkpoint.git
+cd checkpoint/checkpointapp
+```
+   
+2. Va para a pasta chechpoink app instale as dependências e execute o aplicativo:
+```bash
+flutter pub get
+flutter run
+```
 
 ---
 
