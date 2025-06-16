@@ -1,20 +1,22 @@
 import 'package:checkpointapp/root.dart';
 import 'package:checkpointapp/sobre_o_app.dart';
 import 'package:flutter/material.dart';
-// Remova a importação duplicada: import 'root.dart';
-import 'login/login_page.dart';
-import 'login/startpage.dart';
-import 'login/signup.page.dart';
-import 'login/reset-password.page.dart';
+import 'BancoDeDados/user_preferences_services.dart';
+import 'Login/login_page.dart';
+import 'Login/start_page.dart';
+import 'Login/signup_page.dart';
+import 'Login/reset_password_page.dart';
 
 import 'package:firebase_core/firebase_core.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // Importe o pacote de autenticação
+import 'package:firebase_auth/firebase_auth.dart';
 import 'firebase_options.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
+    // Tema e configurações iniciais
+    await UserPreferencesService.loadPreferences();
+
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
@@ -33,20 +35,20 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Checkpoint App',
-      theme: ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple)),
+      theme: ThemeData(
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+      ),
       debugShowCheckedModeBanner: false,
-       //a navegação inicial será tratada pelo 'home'.
+
+      // Rotas
       routes: {
         '/start': (context) => StartPage(),
         '/login': (context) => LoginPage(),
         '/cadastro': (context) => SignupPage(),
         '/reset-password': (context) => ResetPasswordPage(),
-        '/tela_principal': (context) => RootPage(), // Esta será sua tela principal após o login
+        '/tela_principal': (context) => RootPage(),
         '/sobre_o_app': (context) => SobreoApp(),
       },
-
-
-
 
       // O 'home' agora verifica o estado de autenticação(se ta logado ou não)
       home: StreamBuilder<User?>(
@@ -56,11 +58,7 @@ class MyApp extends StatelessWidget {
           // Verifica o estado da conexão com o stream.
           if (snapshot.connectionState == ConnectionState.waiting) {
             // Enquanto o Firebase está verificando, exibe um indicador de carregamento.
-            return Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
+            return Scaffold(body: Center(child: CircularProgressIndicator()));
           } else if (snapshot.hasData) {
             // Se há dados no snapshot (um objeto User não nulo), o usuário está logado.
             // Retorna a sua tela principal (RootPage, conforme suas rotas).

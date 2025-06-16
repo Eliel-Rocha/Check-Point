@@ -64,6 +64,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '297321674230',
     projectId: 'checkpointdb-a8cd7',
     storageBucket: 'checkpointdb-a8cd7.firebasestorage.app',
+    iosClientId: '297321674230-5s4kaa17j0cg8f7bittv3irtoc698s4r.apps.googleusercontent.com',
     iosBundleId: 'com.example.checkpointapp',
   );
 
@@ -73,6 +74,7 @@ class DefaultFirebaseOptions {
     messagingSenderId: '297321674230',
     projectId: 'checkpointdb-a8cd7',
     storageBucket: 'checkpointdb-a8cd7.firebasestorage.app',
+    iosClientId: '297321674230-5s4kaa17j0cg8f7bittv3irtoc698s4r.apps.googleusercontent.com',
     iosBundleId: 'com.example.checkpointapp',
   );
 

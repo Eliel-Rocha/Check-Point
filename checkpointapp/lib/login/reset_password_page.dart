@@ -1,10 +1,71 @@
 import 'package:flutter/material.dart';
+import 'signup_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:checkpointapp/BancoDeDados/auth_service.dart';
+import 'package:checkpointapp/sobre_o_app.dart';
+import 'package:checkpointapp/login/login_page.dart';
 
-class ResetPasswordPage extends StatelessWidget {
+class ResetPasswordPage extends StatefulWidget {
+  @override
+  State<ResetPasswordPage> createState() => _ResetPasswordPageState();
+}
+
+class _ResetPasswordPageState extends State<ResetPasswordPage> {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final AuthService _authService = AuthService();
+  bool _loading = false;
+
+  @override
+  // Limpa os campos ao sair da tela
+  void dispose() {
+    _emailController.dispose();
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  void _sendResetEmail() async {
+    final email = _emailController.text.trim();
+
+    if (email.isEmpty) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Informe um e-mail válido')));
+      return;
+    }
+
+    setState(() => _loading = true);
+
+    try {
+      await _authService.enviarEmailDeRedefinicaoDeSenha(email: email);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Email enviado! Verifique sua caixa de entrada.'),
+        ),
+      );
+
+      await Future.delayed(
+        Duration(seconds: 2),
+      ); // Espera para o usuário ver a mensagem
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => LoginPage()),
+        (Route<dynamic> route) => false,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao enviar o email: $e')));
+    } finally {
+      setState(() => _loading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-
       // APP BAR (voltar) ___________________________________________________________________________________________________________
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -25,7 +86,6 @@ class ResetPasswordPage extends StatelessWidget {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: <Widget>[
-
                 // Informacoes de reset de senha ___________________________________________________________________________________
                 Container(
                   child: Column(
@@ -35,9 +95,7 @@ class ResetPasswordPage extends StatelessWidget {
                         height: 200,
                         child: Image.asset("assets/reset-password-icon.png"),
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
+                      SizedBox(height: 20),
                       Text(
                         "Esqueceu sua senha?",
                         style: TextStyle(
@@ -45,9 +103,7 @@ class ResetPasswordPage extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
-                      SizedBox(
-                        height: 10,
-                      ),
+                      SizedBox(height: 10),
                       Text(
                         "Por favor, informe o E-mail associado a sua conta que enviaremos um link para o mesmo com as instruções para restauração de sua senha.",
                         style: TextStyle(
@@ -55,7 +111,7 @@ class ResetPasswordPage extends StatelessWidget {
                           fontWeight: FontWeight.w400,
                         ),
                         textAlign: TextAlign.center,
-                      )
+                      ),
                     ],
                   ),
                 ),
@@ -66,6 +122,7 @@ class ResetPasswordPage extends StatelessWidget {
                   child: Column(
                     children: <Widget>[
                       TextFormField(
+                        controller: _emailController,
                         keyboardType: TextInputType.emailAddress,
                         decoration: InputDecoration(
                           labelText: "E-mail",
@@ -77,9 +134,7 @@ class ResetPasswordPage extends StatelessWidget {
                         ),
                         style: TextStyle(fontSize: 20),
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
+                      SizedBox(height: 20),
                       Container(
                         height: 60,
                         alignment: Alignment.centerLeft,
@@ -88,38 +143,38 @@ class ResetPasswordPage extends StatelessWidget {
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
                             stops: [0.3, 1],
-                            colors: [
-                              Color(0xFFF58524),
-                              Color(0XFFF92B7F),
-                            ],
+                            colors: [Color(0xFFF58524), Color(0XFFF92B7F)],
                           ),
-                          borderRadius: BorderRadius.all(
-                            Radius.circular(5),
-                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(5)),
                         ),
                         child: SizedBox.expand(
                           child: TextButton(
-                            child: Text(
-                              "Enviar",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                                fontSize: 20,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                            onPressed: () {},
+                            onPressed: _loading ? null : _sendResetEmail,
+                            child:
+                                _loading
+                                    ? CircularProgressIndicator(
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    )
+                                    : Text(
+                                      "Enviar",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                        fontSize: 20,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 20,
-                      ),
+                      SizedBox(height: 20),
                     ],
                   ),
-                )
+                ),
               ],
-            )
+            ),
           ],
         ),
       ),
