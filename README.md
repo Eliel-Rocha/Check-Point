@@ -40,6 +40,42 @@ flutter run
 
 ---
 
+## 🧪 Funcionalidades principais
+
+- [x] Cadastro, login e restore de senha de usuário  (via Firebase)
+- [x] Timeline com postagens
+- [x] Perfil do usuário com edição de dados pessoais
+- [x] Conquistas visuais desbloqueáveis
+- [x] Mapa com pontos salvos
+- [x] Tela "Sobre o App" com carrossel
+- [x] Navegação intuitiva por `BottomNavigationBar`
+
+---
+
+## 🌱 Relação com os Objetivos de Desenvolvimento Sustentável (ODS)
+
+O projeto **CheckPoint** se alinha a alguns dos Objetivos de Desenvolvimento Sustentável da Agenda 2030 da ONU, promovendo o uso da tecnologia para o bem social, educacional e ambiental. A seguir, destacamos os principais ODS relacionados:
+
+### 🎓 ODS 4 – Educação de Qualidade  
+**Assegurar a educação inclusiva e equitativa de qualidade, e promover oportunidades de aprendizagem ao longo da vida.**  
+> O aplicativo incentiva os estudantes da PUC Minas a explorarem o campus e seus espaços históricos, culturais e acadêmicos, promovendo o **engajamento educacional** e a valorização do ambiente universitário.
+
+
+### 🏙️ ODS 11 – Cidades e Comunidades Sustentáveis  
+**Tornar as cidades e os assentamentos humanos inclusivos, seguros, resilientes e sustentáveis.**  
+> Ao promover o reconhecimento de pontos culturais e locais de interesse dentro da universidade, o CheckPoint contribui para a valorização do espaço urbano educacional, incentivando a mobilidade a pé e a apropriação responsável dos espaços.
+
+
+> Saiba mais sobre os ODS: [https://brasil.un.org/pt-br/sdgs](https://brasil.un.org/pt-br/sdgs)
+
+---
+
+## 📸 Capturas de tela
+
+*****
+
+---
+
 ## 🗂️ Estrutura do Repositório
 
 ```bash
@@ -119,21 +155,4 @@ Respositorio:.
 	
 
 ```
----
-
-## 🧪 Funcionalidades principais
-
-- [x] Cadastro, login e restore de senha de usuário  (Firebase)
-- [x] Timeline com postagens
-- [x] Perfil do usuário com edição de dados pessoais
-- [x] Conquistas visuais desbloqueáveis
-- [x] Mapa com pontos salvos
-- [x] Tela "Sobre o App" com carrossel
-- [x] Navegação intuitiva por `BottomNavigationBar`
-
----
-
-## 📸 Capturas de tela
-
-*****
 
