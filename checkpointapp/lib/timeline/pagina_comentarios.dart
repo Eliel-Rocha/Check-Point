@@ -25,14 +25,19 @@ class _CommentScreenState extends State<CommentScreen> {
   @override
   void initState() {
     super.initState();
-    comments = List.from(widget.post['commentList']);
+    comments = (widget.post['comments'] as List<dynamic>? ?? [])
+        .map((e) => {
+      'username': e['username'].toString(),
+      'comment': e['comment'].toString(),
+    })
+        .toList();
   }
 
   void _addComment() {
     if (_commentController.text.isNotEmpty) {
       setState(() {
         comments.add({
-          'user': widget.currentUser,
+          'username': widget.currentUser,
           'comment': _commentController.text,
         });
         _commentController.clear();
@@ -74,7 +79,7 @@ class _CommentScreenState extends State<CommentScreen> {
                   var comment = comments[index];
                   return ListTile(
                     title: Text(
-                      comment['user']!,
+                      comment['username']!,
                       style: const TextStyle(fontWeight: FontWeight.bold),
                     ),
                     subtitle: Text(comment['comment']!),

@@ -74,7 +74,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
               return PostCard(
                 post: post,
                 postIndex: index,
-                currentUser: currentUserId, // ID agora
+                currentUser: currentUserName,
                 updateComments: (i, list) => updateComments(doc.id, list),
                 toggleLike: (i) => toggleLike(doc.id, post['likedBy'] ?? [], post['likes'] ?? 0),
               );
