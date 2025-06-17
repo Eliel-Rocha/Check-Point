@@ -1,7 +1,9 @@
 import 'package:checkpointapp/BancoDeDados/user_preferences_services.dart';
+import 'package:checkpointapp/Profile/configuracoes_perfil.dart';
 import 'package:checkpointapp/root.dart';
 import 'package:checkpointapp/sobre_o_app.dart';
 import 'package:flutter/material.dart';
+import 'package:checkpointapp/BancoDeDados/user_firestore_service.dart';
 
 import 'BancoDeDados/user_firestore_service.dart';
 
@@ -177,6 +179,25 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
               ),
 
+              SizedBox(height: 16),
+
+              //TODO: implementar ir pra pagina de configurações do perfil
+              // Botão de configurações do perfil
+              ListTile(
+                  leading: Icon(Icons.settings),
+                  title: Text('Configurações do Perfil'),
+                  onTap: () {
+                    //var dados = UserFirestoreService.getDadosUsuarioLogado();
+                    /*Navigator.push(
+                      context,
+                      SettingsScreen(
+                          initialName: dados[],
+                          initialImagePath: initialImagePath,
+                        initialBio: initialBio,
+                        onSave: onSave)
+                  )*/
+                  }
+              ),
 
               Text(
                 'Escolha sua Foto de Perfil:',
@@ -236,10 +257,11 @@ class _ConfigPageState extends State<ConfigPage> {
               ListTile(
                 leading: Icon(Icons.info),
                 title: Text('Sobre o App'),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => SobreoApp()),
-                ),
+                onTap: () =>
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => SobreoApp()),
+                    ),
               ),
 
 
