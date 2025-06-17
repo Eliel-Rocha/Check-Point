@@ -111,7 +111,7 @@ class _ConfigPageState extends State<ConfigPage> {
             children: [
 
               Align(
-                alignment: Alignment.centerLeft,
+                alignment: Alignment.center,
                 child: Text(
                   'Selecione ao menos 2 cores:',
                   style: TextStyle(
@@ -180,7 +180,7 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
               ),
 
-              SizedBox(height: 16),
+              SizedBox(height: 30),
 
 
               Text(
