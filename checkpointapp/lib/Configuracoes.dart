@@ -57,10 +57,10 @@ class _ConfigPageState extends State<ConfigPage> {
 
   // Função para carregar a imagem de perfil salva e definir como a atualmente selecionada
   Future<void> _loadInitialProfileImage() async {
-    final savedImagePath = await UserPreferencesService.getProfileImage();
+    //final savedImagePath = await UserPreferencesService.getProfileImage();
     setState(() {
       // Se houver uma imagem salva, use-a. Caso contrário, _currentSelectedProfileImagePath será null.
-      _currentSelectedProfileImagePath = savedImagePath;
+      //_currentSelectedProfileImagePath = savedImagePath;
     });
   }
 
@@ -74,7 +74,7 @@ class _ConfigPageState extends State<ConfigPage> {
   // Função para *salvar* a imagem de perfil selecionada
   Future<void> _saveSelectedProfileImage() async {
     if (_currentSelectedProfileImagePath != null && _currentSelectedProfileImagePath!.isNotEmpty) {
-      await UserPreferencesService.setProfileImage(_currentSelectedProfileImagePath!);
+      //await UserPreferencesService.setProfileImage(_currentSelectedProfileImagePath!);
       // Exibe um feedback ao usuário
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Foto de perfil salva com sucesso!')), // Adicionado 'const'
@@ -93,9 +93,9 @@ class _ConfigPageState extends State<ConfigPage> {
 
 
   final List<String> profileImageOptions = [
-    'assets/images/perfil1.png',
-    'assets/images/perfil2.png',
-    'assets/images/perfil3.png',
+    'assets/flamingo.png',
+    'assets/pinguim.png',
+    'assets/galinha.png',
   ];
 
   String _currentSelectedProfileImagePath = '';
@@ -171,19 +171,78 @@ class _ConfigPageState extends State<ConfigPage> {
 
                   child: Text('Salvar Tema'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: Size(double.infinity, 48),
-                    backgroundColor: selectedColors.isNotEmpty
-                        ? Colors.orange.shade800
+                    minimumSize: const Size(double.infinity, 48),
+                    backgroundColor: _currentSelectedProfileImagePath != null
+                        ? UserPreferencesService.getThemeColor().first
                         : Colors.grey,
+                    foregroundColor: Colors.white,
                   ),
                 ),
               ),
 
               SizedBox(height: 16),
 
+
+              Text(
+                'Escolha sua Foto de Perfil:',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: selectedColors.isNotEmpty
+                      ? selectedColors.first
+                      : Colors.black,
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              //  OPCÕES DE FOTOSS ______
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: profileImageOptions.map((imagePath) {
+                  final isSelected = _currentSelectedProfileImagePath == imagePath;
+                  return GestureDetector(
+                    onTap: () => _selectProfileImage(imagePath), // Apenas seleciona, não salva
+                    child: Container(
+                      width: 80,
+                      height: 80,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: isSelected ? UserPreferencesService.getThemeColor().first : Colors.grey.shade300,
+                          width: isSelected ? 4 : 2,
+                        ),
+                        image: DecorationImage(
+                          image: AssetImage(imagePath),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 15), // Espaço entre as miniaturas e o botão
+
+              //BOTÃO DE SALVAR FOTO DE PERFIl ________
+              ElevatedButton(
+                onPressed: _currentSelectedProfileImagePath != null
+                    ? _saveSelectedProfileImage // Chama a função de salvar
+                    : null, // Desabilita o botão se nenhuma foto for selecionada
+                style: ElevatedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  backgroundColor: _currentSelectedProfileImagePath != null
+                      ? UserPreferencesService.getThemeColor().first
+                      : Colors.grey,
+                  foregroundColor: Colors.white,
+                ),
+                child: const Text('Salvar Foto de Perfil'),
+              ),
+
+              // Final da pagina
+              Spacer(),
+
               //TODO: implementar ir pra pagina de configurações do perfil
               // Botão de configurações do perfil
-              ListTile(
+              /*ListTile(
                   leading: Icon(Icons.settings),
                   title: Text('Configurações do Perfil'),
                   onTap: () {
@@ -198,60 +257,7 @@ class _ConfigPageState extends State<ConfigPage> {
                   )*/
                   }
               ),
-
-              Text(
-                'Escolha sua Foto de Perfil:',
-                style: TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.bold,
-                  color: selectedColors.isNotEmpty
-                      ? selectedColors.first
-                      : Colors.black,
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: profileImageOptions.map((imagePath) {
-                  final isSelected = _currentSelectedProfileImagePath == imagePath;
-                  return GestureDetector(
-                    onTap: () => _selectProfileImage(imagePath), // Apenas seleciona, não salva
-                    child: Container(
-                      width: 80,
-                      height: 80,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: isSelected ? Colors.blue.shade800 : Colors.grey.shade300,
-                          width: isSelected ? 4 : 2,
-                        ),
-                        image: DecorationImage(
-                          image: AssetImage(imagePath),
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                    ),
-                  );
-                }).toList(),
-              ),
-              const SizedBox(height: 15), // Espaço entre as miniaturas e o botão
-              ElevatedButton(
-                onPressed: _currentSelectedProfileImagePath != null
-                    ? _saveSelectedProfileImage // Chama a função de salvar
-                    : null, // Desabilita o botão se nenhuma foto for selecionada
-                style: ElevatedButton.styleFrom(
-                  minimumSize: const Size(double.infinity, 48),
-                  backgroundColor: _currentSelectedProfileImagePath != null
-                      ? Colors.blue.shade800
-                      : Colors.grey,
-                  foregroundColor: Colors.white,
-                ),
-                child: const Text('Salvar Foto de Perfil'),
-              ),
-
-              // Final da pagina
-              Spacer(),
+*/
 
               // Botão "About the App"
               ListTile(
