@@ -28,6 +28,7 @@ class UserFirestoreService {
         'username': username.toLowerCase(),
         'bio': 'Olá! Sou novo por aqui.',
         'data_cadastro': FieldValue.serverTimestamp(),
+        'foto_deperfil' : 'assets/images/perfil1.png'
       });
     } catch (e) {
       print('Erro ao salvar dados iniciais do usuário: $e');

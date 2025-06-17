@@ -88,4 +88,5 @@ class UserPreferencesService {
   static Future<void> setThemeColor(List<Color> color) async {
     await _updateDatabase(theme: color);
   }
+
 }
