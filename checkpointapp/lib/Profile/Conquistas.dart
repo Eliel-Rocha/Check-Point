@@ -45,12 +45,18 @@ class _AchievementsGridState extends State<AchievementsGrid> {
 
         // Obtem dados do prédio para o post
         final predioDoc = await _db.collection('predios').doc(predioProximo.toString()).get();
-        final nomeConquista = predioDoc.data()?['predio']?.toString() ?? 'Prédio $predioProximo';
+        final dataPredio = predioDoc.data() ?? {};
+        final nomeConquista = dataPredio['predio']?.toString() ?? 'Prédio $predioProximo';
+        final imagemConquista = dataPredio['imagem'] ?? 'assets/CheckPoint.png';
 
         // Publica na timeline
         final timelineService = TimelineService();
-        await timelineService.publicarConquistaNaTimeline(nomeConquista);
-
+        try {
+          await timelineService.publicarConquistaNaTimeline(nomeConquista, imagemConquista);
+          print('[SUCESSO] Post enviado para timeline com conquista: $nomeConquista');
+        } catch (e) {
+          print('[ERRO] Falha ao publicar na timeline: $e');
+        }
         // Atualiza UI
         await carregarConquistasDoUsuario();
 

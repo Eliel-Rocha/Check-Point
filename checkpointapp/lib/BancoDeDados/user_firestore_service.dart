@@ -154,9 +154,15 @@ class TimelineService {
   final _db = FirebaseFirestore.instance;
   final _auth = FirebaseAuth.instance;
 
-  Future<void> publicarConquistaNaTimeline(String tituloConquista) async {
+  Future<void> publicarConquistaNaTimeline(String tituloConquista, String imagemConquista) async {
     final user = _auth.currentUser;
-    if (user == null) return;
+
+    if (user == null) {
+      print('[ERRO] Usuário não está logado.');
+      return;
+    }
+
+    print('Publicando conquista "$tituloConquista" para o usuário ${user.uid}');
 
     final usuarioDoc = await _db.collection('usuarios').doc(user.uid).get();
     final nomeUsuario = usuarioDoc.data()?['nome'] ?? 'Usuário';
@@ -169,10 +175,15 @@ class TimelineService {
       'likedBy': [],
       'commentsNum': 0,
       'comments': [],
-      'image': 'assets/CheckPoint.png', // imagem default de conquista
+      'image': imagemConquista,
       'timestamp': FieldValue.serverTimestamp()
     };
 
-    await _db.collection('timeline_posts').add(novoPost);
+    try {
+      await _db.collection('timeline_posts').add(novoPost);
+      print('[SUCESSO] Post enviado para timeline.');
+    } catch (e) {
+      print('[ERRO] Falha ao enviar post para timeline: $e');
+    }
   }
 }

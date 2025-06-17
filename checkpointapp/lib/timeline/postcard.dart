@@ -19,6 +19,15 @@ class PostCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final username = post['username'] ?? 'Usuário';
+    final handle = post['handle'] ?? '@usuario';
+    final caption = post['caption'] ?? '';
+    final imagePath = post['image'] ?? 'assets/placeholder.png';
+    final likedBy = (post['likedBy'] ?? []) as List;
+    final likes = post['likes'] ?? 0;
+    final comments = post['comments'] ?? [];
+    final time = post['time'] ?? '';
+
     return Card(
       margin: const EdgeInsets.all(10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -37,14 +46,8 @@ class PostCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      post['username'],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      post['handle'],
-                      style: const TextStyle(color: Colors.grey),
-                    ),
+                    Text(username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(handle, style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
               ],
@@ -59,7 +62,7 @@ class PostCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    post['caption'],
+                    caption,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -69,7 +72,7 @@ class PostCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.zero, // totalmente quadrada
                     child: Image.asset(
-                      post['image'],
+                      imagePath,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,
@@ -91,15 +94,11 @@ class PostCard extends StatelessWidget {
                   child: Row(
                     children: [
                       Icon(
-                        post['likedBy'].contains(currentUser)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: post['likedBy'].contains(currentUser)
-                            ? Colors.red
-                            : Colors.grey,
+                        likedBy.contains(currentUser) ? Icons.favorite : Icons.favorite_border,
+                        color: likedBy.contains(currentUser) ? Colors.red : Colors.grey,
                       ),
                       const SizedBox(width: 5),
-                      Text('${post['likes']}'),
+                      Text('$likes'),
                     ],
                   ),
                 ),
@@ -141,11 +140,11 @@ class PostCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.comment, color: Colors.grey),
                       const SizedBox(width: 5),
-                      Text('${post['comments']}'),
+                      Text('${comments.length}'),
                     ],
                   ),
                 ),
-                Text(post['time']),
+                Text(time),
               ],
             ),
           ),
