@@ -1,5 +1,6 @@
 import 'package:checkpointapp/timeline/postcard.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class TimelineScreen extends StatefulWidget {
@@ -10,7 +11,22 @@ class TimelineScreen extends StatefulWidget {
 }
 
 class _TimelineScreenState extends State<TimelineScreen> {
-  final String currentUser = 'Usuário Logado';
+  String currentUserId = '';
+  String currentUserName = '';
+
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      currentUserId = user.uid;
+      FirebaseFirestore.instance.collection('usuarios').doc(user.uid).get().then((doc) {
+        setState(() {
+          currentUserName = doc.data()?['nome'] ?? 'Usuário';
+        });
+      });
+    }
+  }
 
   void updateComments(String postId, List<Map<String, String>> updatedList) {
     FirebaseFirestore.instance.collection('timeline_posts').doc(postId).update({
@@ -22,11 +38,11 @@ class _TimelineScreenState extends State<TimelineScreen> {
   void toggleLike(String postId, List<dynamic> likedBy, int likes) {
     final postRef = FirebaseFirestore.instance.collection('timeline_posts').doc(postId);
 
-    if (likedBy.contains(currentUser)) {
-      likedBy.remove(currentUser);
+    if (likedBy.contains(currentUserId)) {
+      likedBy.remove(currentUserId);
       likes -= 1;
     } else {
-      likedBy.add(currentUser);
+      likedBy.add(currentUserId);
       likes += 1;
     }
 
@@ -58,7 +74,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
               return PostCard(
                 post: post,
                 postIndex: index,
-                currentUser: currentUser,
+                currentUser: currentUserId, // ID agora
                 updateComments: (i, list) => updateComments(doc.id, list),
                 toggleLike: (i) => toggleLike(doc.id, post['likedBy'] ?? [], post['likes'] ?? 0),
               );

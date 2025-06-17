@@ -166,9 +166,11 @@ class TimelineService {
 
     final usuarioDoc = await _db.collection('usuarios').doc(user.uid).get();
     final nomeUsuario = usuarioDoc.data()?['nome'] ?? 'Usuário';
+    final handleUsuario = usuarioDoc.data()?['username'] ?? '@usuario';
 
     final novoPost = {
       'username': nomeUsuario,
+      'handle': '@$handleUsuario',
       'userId': user.uid,
       'caption': 'Acabei de conquistar: $tituloConquista! 🏆',
       'likes': 0,

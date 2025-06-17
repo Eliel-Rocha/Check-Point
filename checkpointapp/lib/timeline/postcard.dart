@@ -22,7 +22,7 @@ class PostCard extends StatelessWidget {
     final username = post['username'] ?? 'Usuário';
     final handle = post['handle'] ?? '@usuario';
     final caption = post['caption'] ?? '';
-    final imagePath = post['image'] ?? 'assets/placeholder.png';
+    final imagePath = post['image'] ?? 'assets/CheckPoint.png';
     final likedBy = (post['likedBy'] ?? []) as List;
     final likes = post['likes'] ?? 0;
     final comments = post['comments'] ?? [];
@@ -40,7 +40,7 @@ class PostCard extends StatelessWidget {
             child: Row(
               children: [
                 const CircleAvatar(
-                  backgroundImage: AssetImage('assets/Chiquinha.jpg'),
+                  backgroundImage: AssetImage('assets/galinha.png'),
                 ),
                 const SizedBox(width: 10),
                 Column(
