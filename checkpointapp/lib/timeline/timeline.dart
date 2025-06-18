@@ -36,7 +36,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
     });
   }
 
-  void toggleLike(String postId, List<dynamic> likedBy, int likes) {
+  void toggleLike(String postId, List<dynamic> likedBy, int likes) async {
     final postRef = FirebaseFirestore.instance.collection('timeline_posts').doc(postId);
 
     if (likedBy.contains(currentUserId)) {
@@ -47,10 +47,13 @@ class _TimelineScreenState extends State<TimelineScreen> {
       likes += 1;
     }
 
-    postRef.update({
+    await postRef.update({
       'likedBy': likedBy,
       'likes': likes,
     });
+
+    // Força reconstrução da interface
+    setState(() {});
   }
 
   @override

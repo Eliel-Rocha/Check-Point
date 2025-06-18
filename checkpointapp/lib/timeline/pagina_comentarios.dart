@@ -51,62 +51,70 @@ class _CommentScreenState extends State<CommentScreen> {
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: () async {
-        Navigator.pop(context, comments); // Retorna os comentários atualizados
+        Navigator.pop(context, comments);
         return false;
       },
-      child: Container(
-        color: Colors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 10),
-        child: Column(
-          children: [
-            Container(
-              width: 40,
-              height: 5,
-              margin: const EdgeInsets.only(bottom: 10),
-              decoration: BoxDecoration(
-                color: Colors.orange[300],
-                borderRadius: BorderRadius.circular(100),
-              ),
+      child: Scaffold(
+        resizeToAvoidBottomInset: true,
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 10,
             ),
-            const Text(
-              'Comentários',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const Divider(),
-            Expanded(
-              child: ListView.builder(
-                itemCount: comments.length,
-                itemBuilder: (context, index) {
-                  var comment = comments[index];
-                  return ListTile(
-                    title: Text(
-                      comment['username']!,
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    subtitle: Text(comment['comment']!),
-                  );
-                },
-              ),
-            ),
-            Row(
+            child: Column(
               children: [
-                Expanded(
-                  child: TextField(
-                    controller: _commentController,
-                    decoration: const InputDecoration(
-                      hintText: 'Escreva um comentário...',
-                      border: OutlineInputBorder(),
-                    ),
+                Container(
+                  width: 40,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 10),
+                  decoration: BoxDecoration(
+                    color: Colors.orange[300],
+                    borderRadius: BorderRadius.circular(100),
                   ),
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send, color: Colors.orange),
-                  onPressed: _addComment,
+                const Text(
+                  'Comentários',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const Divider(),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: comments.length,
+                    itemBuilder: (context, index) {
+                      var comment = comments[index];
+                      return ListTile(
+                        title: Text(
+                          comment['username']!,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(comment['comment']!),
+                      );
+                    },
+                  ),
+                ),
+                Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _commentController,
+                        decoration: const InputDecoration(
+                          hintText: 'Escreva um comentário...',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.send, color: Colors.orange),
+                      onPressed: _addComment,
+                    ),
+                  ],
                 ),
               ],
             ),
-            const SizedBox(height: 10),
-          ],
+          ),
         ),
       ),
     );

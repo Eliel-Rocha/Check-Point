@@ -144,7 +144,6 @@ class PostCard extends StatefulWidget {
                   child: Row(
                     children: [
                       Icon(
-                        // Acessando currentUser através de 'widget.'
                         likedBy.contains(widget.currentUser) ? Icons.favorite : Icons.favorite_border,
                         color: likedBy.contains(widget.currentUser) ? Colors.red : Colors.grey,
                       ),
