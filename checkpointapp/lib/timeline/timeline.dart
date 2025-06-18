@@ -22,7 +22,8 @@ class _TimelineScreenState extends State<TimelineScreen> {
       currentUserId = user.uid;
       FirebaseFirestore.instance.collection('usuarios').doc(user.uid).get().then((doc) {
         setState(() {
-          currentUserName = doc.data()?['nome'] ?? 'Usuário';
+          //currentUserName = doc.data()?['nome'] ?? 'Usuário';
+          currentUserName = doc.data()?['username'] ?? 'Usuário';
         });
       });
     }
@@ -74,7 +75,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
               return PostCard(
                 post: post,
                 postIndex: index,
-                currentUser: currentUserName,
+                currentUser: currentUserName, //currentUserName
                 updateComments: (i, list) => updateComments(doc.id, list),
                 toggleLike: (i) => toggleLike(doc.id, post['likedBy'] ?? [], post['likes'] ?? 0),
               );
