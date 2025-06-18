@@ -7,9 +7,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:checkpointapp/BancoDeDados/user_firestore_service.dart';
 
-import 'BancoDeDados/user_firestore_service.dart';
-
 class ConfigPage extends StatefulWidget {
+
+  final VoidCallback onOpenProfileSettings;
+
+  const ConfigPage({
+    super.key,
+    required this.onOpenProfileSettings
+  });
+
   @override
   State<ConfigPage> createState() => _ConfigPageState();
 }
@@ -71,7 +77,8 @@ class _ConfigPageState extends State<ConfigPage> {
   Future<void> _loadInitialProfileImage() async {
     // Obter a foto do banco!
     final usuarioDoc = await FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser?.uid).get();
-    final foto = usuarioDoc.data()?['foto_perfil'];
+    //final usuarioDoc = await UserFirestoreService().getDadosUsuarioLogado();
+    final foto = usuarioDoc.data()?['foto_perfil'] ?? 'assets/profile-picture2.png';
 
     setState(() {
       _currentSelectedProfileImagePath =  foto;
@@ -98,7 +105,7 @@ class _ConfigPageState extends State<ConfigPage> {
 
         // Exibe um feedback ao usuário
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Foto de perfil salva com sucesso!')), // Adicionado 'const'
+        const SnackBar(content: Text('Foto de perfil salva com sucesso!')),
       );
       // Recarregar a tela principal opcional(?)
       Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  RootPage()));
@@ -107,7 +114,7 @@ class _ConfigPageState extends State<ConfigPage> {
     } else {
 
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Por favor, selecione uma foto de perfil.')), // Adicionado 'const'
+        const SnackBar(content: Text('Por favor, selecione uma foto de perfil.')),
       );
     }
   }
@@ -117,7 +124,6 @@ class _ConfigPageState extends State<ConfigPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        // Sem AppBar conforme solicitado
         body: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
@@ -235,14 +241,10 @@ class _ConfigPageState extends State<ConfigPage> {
 
               //BOTÃO DE SALVAR FOTO DE PERFIl ________
               ElevatedButton(
-                onPressed: _currentSelectedProfileImagePath != null
-                    ? _saveSelectedProfileImage // Chama a função de salvar
-                    : null, // Desabilita o botão se nenhuma foto for selecionada
+                onPressed: _saveSelectedProfileImage,
                 style: ElevatedButton.styleFrom(
                   minimumSize: const Size(double.infinity, 48),
-                  backgroundColor: _currentSelectedProfileImagePath != null
-                      ? UserPreferencesService.getThemeColor().first
-                      : Colors.grey,
+                  backgroundColor: UserPreferencesService.getThemeColor().first,
                   foregroundColor: Colors.white,
                 ),
                 child: const Text('Salvar Foto de Perfil'),
@@ -251,24 +253,17 @@ class _ConfigPageState extends State<ConfigPage> {
               // Final da pagina
               Spacer(),
 
-              //TODO: implementar ir pra pagina de configurações do perfil
               // Botão de configurações do perfil
-              /*ListTile(
+              ListTile(
                   leading: Icon(Icons.settings),
                   title: Text('Configurações do Perfil'),
                   onTap: () {
-                    //var dados = UserFirestoreService.getDadosUsuarioLogado();
-                    /*Navigator.push(
-                      context,
-                      SettingsScreen(
-                          initialName: dados[],
-                          initialImagePath: initialImagePath,
-                        initialBio: initialBio,
-                        onSave: onSave)
-                  )*/
+                    //var dados = UserFirestoreService().getDadosUsuarioLogado();
+                    widget.onOpenProfileSettings();
+
                   }
               ),
-*/
+
 
               // Botão "About the App"
               ListTile(
