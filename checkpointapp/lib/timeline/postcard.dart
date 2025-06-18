@@ -1,4 +1,6 @@
 import 'package:checkpointapp/timeline/pagina_comentarios.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class PostCard extends StatelessWidget {
@@ -27,6 +29,12 @@ class PostCard extends StatelessWidget {
     final likes = post['likes'] ?? 0;
     final comments = post['comments'] ?? [];
     final time = post['time'] ?? '';
+
+    //********************************************************************************************
+    // TODO: Lógica limpa que busca os dados do usuario de acordo com o UID fornecido
+    // DEVERIA ESTAR no init state??
+    //final usuarioDoc = await FirebaseFirestore.instance.collection('usuarios').doc(currentUser.uid).get();
+    //final foto = usuarioDoc.data()?['foto_perfil'] ?? 'assets/profile-picture2.png';
 
     return Card(
       margin: const EdgeInsets.all(10),
