@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart'; // Para obter o ID do usuário logado
@@ -23,11 +25,12 @@ class UserFirestoreService {
   }) async {
     try {
       await _db.collection('usuarios').doc(userId).set({
-        'nome': 'Name',
+        'nome': username.toLowerCase(),
         'email': email,
         'username': username.toLowerCase(),
         'bio': 'Olá! Sou novo por aqui.',
         'data_cadastro': FieldValue.serverTimestamp(),
+        'foto_perfil' : 'assets/' + (["galinha.png", "penguim.png", "flamingo.png"]..shuffle()).first,    // pegar uma foto de perfil aleatoria
       });
     } catch (e) {
       print('Erro ao salvar dados iniciais do usuário: $e');
@@ -147,4 +150,46 @@ class UserFirestoreService {
     }
   }
 
+}
+
+//-----------------Time line-----------------------
+class TimelineService {
+  final _db = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
+  Future<void> publicarConquistaNaTimeline(String tituloConquista, String imagemConquista) async {
+    final user = _auth.currentUser;
+
+    if (user == null) {
+      print('[ERRO] Usuário não está logado.');
+      return;
+    }
+
+
+    print('Publicando conquista "$tituloConquista" para o usuário ${user.uid}');
+
+    final usuarioDoc = await _db.collection('usuarios').doc(user.uid).get();
+    final nomeUsuario = usuarioDoc.data()?['nome'] ?? 'Usuário';
+    final handleUsuario = usuarioDoc.data()?['username'] ?? '@usuario';
+
+    final novoPost = {
+      'username': nomeUsuario,
+      'handle': '@$handleUsuario',
+      'userId': user.uid,
+      'caption': 'Acabei de conquistar: $tituloConquista! 🏆',
+      'likes': 0,
+      'likedBy': [],
+      'commentsNum': 0,
+      'comments': [],
+      'image': imagemConquista,
+      'timestamp': FieldValue.serverTimestamp()
+    };
+
+    try {
+      await _db.collection('timeline_posts').add(novoPost);
+      print('[SUCESSO] Post enviado para timeline.');
+    } catch (e) {
+      print('[ERRO] Falha ao enviar post para timeline: $e');
+    }
+  }
 }

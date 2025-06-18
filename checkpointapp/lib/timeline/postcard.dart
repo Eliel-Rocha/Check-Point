@@ -1,7 +1,9 @@
 import 'package:checkpointapp/timeline/pagina_comentarios.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+//import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
-class PostCard extends StatelessWidget {
+class PostCard extends StatefulWidget {
   final Map<String, dynamic> post;
   final int postIndex;
   final String currentUser;
@@ -18,7 +20,53 @@ class PostCard extends StatelessWidget {
   });
 
   @override
+  State<PostCard> createState() => _PostCardState();
+}
+
+  class _PostCardState extends State<PostCard> {
+  String _profileImageUrl = 'assets/CheckPoint.png'; // Imagem padrão
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchProfileImage(); // Chama a função para buscar a imagem
+  }
+
+  Future<void> _fetchProfileImage() async {
+    final postAuthorUid = widget.post['userId']; // <--- ESSENCIAL: PEGA O UID DO AUTOR DO POST
+
+    if (postAuthorUid != null && postAuthorUid.isNotEmpty) {
+      try {
+        final userDoc = await FirebaseFirestore.instance.collection('usuarios').doc(postAuthorUid).get();
+        if (userDoc.exists && userDoc.data()!.containsKey('foto_perfil')) {
+          setState(() {
+            _profileImageUrl = userDoc.data()!['foto_perfil'];
+          });
+        }
+      } catch (e) {
+        print('Erro ao buscar foto de perfil para $postAuthorUid: $e');
+        // Você pode definir uma imagem de erro ou manter a padrão aqui
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
+    final username = widget.post['username'] ?? 'Usuário';
+    final handle = widget.post['handle'] ?? '@usuario';
+    final caption = widget.post['caption'] ?? '';
+    final imagePath = widget.post['image'] ?? 'assets/CheckPoint.png';
+    final likedBy = (widget.post['likedBy'] ?? []) as List;
+    final likes = widget.post['likes'] ?? 0;
+    final comments = widget.post['comments'] ?? [];
+    final time = widget.post['time'] ?? '';
+
+    //********************************************************************************************
+    // TODO: Lógica limpa que busca os dados do usuario de acordo com o UID fornecido
+    // DEVERIA ESTAR no init state??
+    //final usuarioDoc = await FirebaseFirestore.instance.collection('usuarios').doc(currentUser.uid).get();
+    //final foto = usuarioDoc.data()?['foto_perfil'] ?? 'assets/profile-picture2.png';
+
     return Card(
       margin: const EdgeInsets.all(10),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -30,21 +78,23 @@ class PostCard extends StatelessWidget {
             padding: const EdgeInsets.all(10.0),
             child: Row(
               children: [
-                const CircleAvatar(
-                  backgroundImage: AssetImage('assets/Chiquinha.jpg'),
+                CircleAvatar(
+                  // AQUI É ONDE A MUDANÇA ACONTECE NO CIRCLEAVATAR
+                  backgroundImage: _profileImageUrl.startsWith('http')
+                      ? NetworkImage(_profileImageUrl) as ImageProvider
+                      : AssetImage(_profileImageUrl) as ImageProvider,
+                  onBackgroundImageError: (exception, stackTrace) {
+                    setState(() {
+                      _profileImageUrl = 'assets/CheckPoint.png'; // Volta para a imagem padrão em caso de erro
+                    });
+                  },
                 ),
                 const SizedBox(width: 10),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      post['username'],
-                      style: const TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      post['handle'],
-                      style: const TextStyle(color: Colors.grey),
-                    ),
+                    Text(username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(handle, style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
               ],
@@ -59,7 +109,7 @@ class PostCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Text(
-                    post['caption'],
+                    caption,
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                 ),
@@ -69,7 +119,7 @@ class PostCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.zero, // totalmente quadrada
                     child: Image.asset(
-                      post['image'],
+                      imagePath,
                       width: 100,
                       height: 100,
                       fit: BoxFit.cover,
@@ -80,6 +130,8 @@ class PostCard extends StatelessWidget {
             ),
           ),
 
+
+          // Conquista
           // Ações
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
@@ -87,19 +139,16 @@ class PostCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  onTap: () => toggleLike(postIndex),
+                  // Acessando toggleLike através de 'widget.'
+                  onTap: () => widget.toggleLike(widget.postIndex),
                   child: Row(
                     children: [
                       Icon(
-                        post['likedBy'].contains(currentUser)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color: post['likedBy'].contains(currentUser)
-                            ? Colors.red
-                            : Colors.grey,
+                        likedBy.contains(widget.currentUser) ? Icons.favorite : Icons.favorite_border,
+                        color: likedBy.contains(widget.currentUser) ? Colors.red : Colors.grey,
                       ),
                       const SizedBox(width: 5),
-                      Text('${post['likes']}'),
+                      Text('$likes'),
                     ],
                   ),
                 ),
@@ -122,10 +171,11 @@ class PostCard extends StatelessWidget {
                             maxChildSize: 0.95,
                             builder: (context, scrollController) {
                               return CommentScreen(
-                                post: post,
-                                postIndex: postIndex,
-                                currentUser: currentUser,
-                                updateComments: updateComments,
+                                // Acessando as propriedades do widget através de 'widget.'
+                                post: widget.post,
+                                postIndex: widget.postIndex,
+                                currentUser: widget.currentUser,
+                                updateComments: widget.updateComments,
                               );
                             },
                           ),
@@ -133,7 +183,8 @@ class PostCard extends StatelessWidget {
                       },
                     ).then((updatedComments) {
                       if (updatedComments != null) {
-                        updateComments(postIndex, updatedComments as List<Map<String, String>>);
+                        // Acessando updateComments e postIndex através de 'widget.'
+                        widget.updateComments(widget.postIndex, updatedComments as List<Map<String, String>>);
                       }
                     });
                   },
@@ -141,11 +192,11 @@ class PostCard extends StatelessWidget {
                     children: [
                       const Icon(Icons.comment, color: Colors.grey),
                       const SizedBox(width: 5),
-                      Text('${post['comments']}'),
+                      Text('${comments.length}'),
                     ],
                   ),
                 ),
-                Text(post['time']),
+                Text(time),
               ],
             ),
           ),

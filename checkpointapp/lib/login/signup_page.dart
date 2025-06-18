@@ -151,38 +151,7 @@ class _SignupPageState extends State<SignupPage> {
                       fit: BoxFit.fitHeight,
                     ),
                   ),
-                  child: Container(
-                    height: 56,
-                    width: 56,
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        stops: [0.3, 1.0],
-                        colors: [
-                          Color(0xFFF58524),
-                          Color(0XFFF92B7F),
-                        ],
-                      ),
-                      border: Border.all(
-                        width: 4.0,
-                        color: const Color(0xFFFFFFFF),
-                      ),
-                      borderRadius: BorderRadius.all(
-                        Radius.circular(56),
-                      ),
-                    ),
-                    child: SizedBox.expand(
-                      child: TextButton(
-                        child: Icon(
-                          Icons.add,
-                          color: Colors.white,
-                        ),
-                        onPressed: () {},
-                      ),
-                    ),
-                  ),
+
                 ),
 
                 //------------------Email----------------------//
@@ -191,7 +160,7 @@ class _SignupPageState extends State<SignupPage> {
                     controller: _usernameController,
                     decoration: InputDecoration(
                       labelText: "Nome de Usuário",
-                      hintText: "ex: seu_nome_123",
+                      hintText: "seu_nome_123",
                       prefixText: "@", // Prefixo para indicar que é um handle
                       labelStyle: TextStyle(
                         color: Colors.black38,

@@ -153,17 +153,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
           top: 16.0,
           bottom: MediaQuery.of(context).viewInsets.bottom + 20,
         ),
-        child: Column(
+        child:  Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             GestureDetector(
-              onTap: _showImageSourceDialog,
+              // SELECIONAR FOTO DE PERFIl da camera/ galeria (destivado)
+              //onTap: _showImageSourceDialog,
               child: CircleAvatar(
                 radius: 50,
-                backgroundImage:
-                _imagePath != null ? FileImage(File(_imagePath!)) : null,
-                child: _imagePath == null ? Icon(Icons.person, size: 50) : null,
-              ),
+                //backgroundImage: FileImage(File(_imagePath!)),
+                child: Image.asset(_imagePath!),
+                //child: _imagePath == null ? Icon(Icons.person, size: 50) : null,
+              )
             ),
             SizedBox(height: 20),
             TextField(
@@ -182,6 +183,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 _tempBio = value;
               },
             ),
+
 
             //---------------logout---------------------------------------------------
             SizedBox(height: 20),
@@ -222,7 +224,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
 
             //--------------------------------------fim do logout--------------------------------------------------
-            SizedBox(height: 200),
+
             TextButton(
               onPressed: () async {
                 final TextEditingController emailController =

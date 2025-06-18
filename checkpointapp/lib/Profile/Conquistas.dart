@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart';
 
+
 import '../BancoDeDados/user_firestore_service.dart';
 
 class AchievementsGrid extends StatefulWidget {
@@ -41,6 +42,22 @@ class _AchievementsGridState extends State<AchievementsGrid> {
 
       if (predioProximo != null) {
         await userService.adicionarPredioConquistado(predioProximo);
+
+        // Obtem dados do prédio para o post
+        final predioDoc = await _db.collection('predios').doc(predioProximo.toString()).get();
+        final dataPredio = predioDoc.data() ?? {};
+        final nomeConquista = dataPredio['predio']?.toString() ?? 'Prédio $predioProximo';
+        final imagemConquista = dataPredio['imagem'] ?? 'assets/CheckPoint.png';
+
+        // Publica na timeline
+        final timelineService = TimelineService();
+        try {
+          await timelineService.publicarConquistaNaTimeline(nomeConquista, imagemConquista);
+          print('[SUCESSO] Post enviado para timeline com conquista: $nomeConquista');
+        } catch (e) {
+          print('[ERRO] Falha ao publicar na timeline: $e');
+        }
+        // Atualiza UI
         await carregarConquistasDoUsuario();
 
         ScaffoldMessenger.of(context).showSnackBar(

@@ -50,6 +50,7 @@ class RootPageState extends State<RootPage> {
     final userData = await _firestoreService.getDadosUsuarioLogado();
     if (mounted && userData != null) {
       setState(() {
+        _profileImagePath = userData['foto_perfil'] ?? 'assets/profile-picture2.png';
         _profileName = userData['nome'] ?? 'Sem nome';
         _profileBio = userData['bio'] ?? '';
         _profileUsername = userData['username'] ?? 'sem_usuario'; // ADICIONADO: Carrega o username
@@ -62,7 +63,7 @@ class RootPageState extends State<RootPage> {
     }
   }
 
-  void _openSettings() {
+  void openSettings() {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -72,14 +73,14 @@ class RootPageState extends State<RootPage> {
           initialBio: _profileBio,
         onSave: (newName, newImagePath, newBio) async {
           try {
-            // 1. Salva no Firestore
+            // Salva no Firestore
             await _firestoreService.atualizarDadosUsuario({
               'nome': newName,
               'bio': newBio,
               // 'profileImageUrl': newImagePath, // Para quando implementar a imagem
             });
 
-            // 2. Atualiza o estado local na RootPage (já fazia)
+            // Atualiza o estado local na RootPage (já fazia)
             setState(() {
               _profileName = newName;
               _profileImagePath = newImagePath;
@@ -117,7 +118,7 @@ class RootPageState extends State<RootPage> {
           username: _profileUsername,
       ),
       FullMap(),
-      ConfigPage(),
+      ConfigPage(onOpenProfileSettings: openSettings),      // passar a função por parametro
     ];
 
     return Scaffold(
@@ -150,7 +151,7 @@ class RootPageState extends State<RootPage> {
             ? [
           IconButton(
             icon: Icon(Icons.settings, color: _colorTextAppBar),
-            onPressed: _openSettings,
+            onPressed: openSettings,
           ),
         ]
             : null,

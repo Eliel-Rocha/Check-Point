@@ -23,6 +23,12 @@ class FullMapState extends State<FullMap> {
   late final Future<geo.Position?> _posFuture;
   final TextEditingController _descriptionController = TextEditingController();
 
+
+  Uint8List? _defaultIcon;
+  Uint8List? _selectedIcon;
+  LocationModel? _selectedLocation;
+  final Map<String, int> _annotationIdToLocationIdMap = {};
+
   final ValueNotifier<double> _sheetOffset = ValueNotifier(
     0.4,
   ); // começa no initialChildSize
@@ -35,6 +41,40 @@ class FullMapState extends State<FullMap> {
 
   MapboxMap? _mapboxMap;
   PointAnnotationManager? _pointAnnotationManager;
+
+
+  Future<void> _loadIcons() async {
+    _defaultIcon = (await rootBundle.load('assets/CheckPoint.png')).buffer.asUint8List();
+    _selectedIcon = (await rootBundle.load('assets/map_marker.png')).buffer.asUint8List();
+  }
+
+  // Chamado quando um marcador é clicado
+  void _onAnnotationClick(PointAnnotation annotation) {
+    final clickedId = _annotationIdToLocationIdMap[annotation.id];
+    if (clickedId == null) return;
+
+    final clickedLocation = _localizacoesSalvas.firstWhere((loc) => loc.id == clickedId);
+
+    _selectLocation(clickedLocation);
+  }
+
+  // Lógica para selecionar um local
+  Future<void> _selectLocation(LocationModel location) async {
+    setState(() {
+      _selectedLocation = location;
+    });
+    //_moveToLocation(location.latitude, location.longitude);
+    await _atualizarMarcadoresNoMapa();
+  }
+
+  // Lógica para limpar a seleção
+  Future<void> _deselect() async {
+    setState(() {
+      _selectedLocation = null;
+    });
+    await _atualizarMarcadoresNoMapa();
+    await _ajustarCameraParaTodosOsPontos();
+  }
 
   Future<void> _ajustarCameraParaTodosOsPontos() async {
     // Se não há pontos ou mapa não inicializado, aborta
@@ -70,47 +110,49 @@ class FullMapState extends State<FullMap> {
   }
 
   Future<void> _atualizarMarcadoresNoMapa() async {
-    if (_pointAnnotationManager == null) return;
+    if (_pointAnnotationManager == null || _defaultIcon == null || _selectedIcon == null) return;
 
-    // Remove todos os marcadores existentes
+    // Limpa os marcadores antigos do mapa e mapa de associação
     await _pointAnnotationManager!.deleteAll();
+    _annotationIdToLocationIdMap.clear();
 
+    // Loop para criar cada marcador com o ícone e associação
     for (var loc in _localizacoesSalvas) {
-      final point = Point(coordinates: Position(loc.longitude, loc.latitude));
+      final isSelected = loc.id == _selectedLocation?.id;
 
-      await _pointAnnotationManager!.create(await getoptions(point));
+      // Cria a anotação no mapa
+      final newAnnotation = await _pointAnnotationManager!.create(
+        PointAnnotationOptions(
+          geometry: Point(coordinates: Position(loc.longitude, loc.latitude)),
+          image: isSelected ? _selectedIcon! : _defaultIcon!,
+          iconSize: 0.06,
+        ),
+      );
+
+      // Salva a associação: ID do Mapbox -> ID do Banco de Dados
+      _annotationIdToLocationIdMap[newAnnotation.id] = loc.id!;
     }
-    _ajustarCameraParaTodosOsPontos();
   }
 
   List<LocationModel> _localizacoesSalvas = [];
 
   Future<void> _carregarLocalizacoes() async {
     final localizacoes = await LocationDatabase.getAllLocations();
-
     setState(() {
       _localizacoesSalvas = localizacoes;
     });
-
-    // Após atualizar a lista, redesenha os marcadores
-    if (_mapboxMap != null && _pointAnnotationManager != null) {
-      await _pointAnnotationManager!.deleteAll();
-
-      for (var loc in localizacoes) {
-        final point = Point(coordinates: Position(loc.longitude, loc.latitude));
-
-        await _pointAnnotationManager!.create(await getoptions(point));
-      }
-    }
-    _ajustarCameraParaTodosOsPontos();
+    // Chama a função que vai desenhar os marcadores
+    await _atualizarMarcadoresNoMapa();
   }
 
   @override
   void initState() {
     super.initState();
+    _loadIcons();
     _posFuture = _initLocation();
     _requestPermissions();
     _checkLocationServices();
+
     //_carregarLocalizacoes();
   }
 
@@ -163,39 +205,16 @@ class FullMapState extends State<FullMap> {
       LocationComponentSettings(enabled: true, pulsingEnabled: true),
     );
 
-    if (pos != null) {
-      await mapboxMap.setCamera(
-        CameraOptions(
-          center: Point(coordinates: Position(pos.longitude, pos.latitude)),
-          zoom: 16.0,
-        ),
-      );
-
-      await _carregarLocalizacoes();
-      await _atualizarMarcadoresNoMapa();
-    }
-
-    _pointAnnotationManager =
-        await mapboxMap.annotations.createPointAnnotationManager();
-
-    // Adiciona os marcadores com ícone
-    for (var loc in _localizacoesSalvas) {
-      final point = Point(coordinates: Position(loc.longitude, loc.latitude));
-
-      await _pointAnnotationManager?.create(await getoptions(point));
-    }
-    _ajustarCameraParaTodosOsPontos();
-  }
-
-  Future<PointAnnotationOptions> getoptions(Point point) async {
-    final ByteData bytes = await rootBundle.load('assets/CheckPoint.png');
-    final Uint8List imageData = bytes.buffer.asUint8List();
-
-    return PointAnnotationOptions(
-      geometry: point,
-      iconSize: 0.06,
-      image: imageData,
+    _pointAnnotationManager = await mapboxMap.annotations.createPointAnnotationManager();
+    _pointAnnotationManager?.addOnPointAnnotationClickListener(
+      AnnotationClickListener(this),
     );
+
+
+    await _carregarLocalizacoes();
+
+    await _goToUserLocation();
+
   }
 
   Future<void> _goToUserLocation() async {
@@ -208,7 +227,7 @@ class FullMapState extends State<FullMap> {
         _mapboxMap!.flyTo(
           CameraOptions(
             center: Point(
-              coordinates: Position(position.longitude, position.latitude),
+              coordinates: Position(position.longitude , position.latitude),
             ),
             zoom: 16.0,
           ),
@@ -273,8 +292,8 @@ class FullMapState extends State<FullMap> {
               // BARRA DE LOCALIZAÇOES SALVAS
               DraggableScrollableSheet(
                 initialChildSize: 0.4,
-                minChildSize: 0.2,
-                maxChildSize: 0.6,
+                minChildSize: 0.25,
+                maxChildSize: 0.85,
                 builder: (context, scrollController) {
                   return NotificationListener<DraggableScrollableNotification>(
                     onNotification: (notification) {
@@ -325,6 +344,8 @@ class FullMapState extends State<FullMap> {
                         );
                       },
                       scrollController: scrollController,
+                      selectedLocation: _selectedLocation,
+                      onDeselect: _deselect,
                     ),
                   );
                 },
@@ -340,14 +361,14 @@ class FullMapState extends State<FullMap> {
                   return Positioned(
                     bottom:
                         sheetHeight -
-                        20, // pode ajustar esse "-20" se quiser o botão mais colado
+                        20, // da pra ajustar se quiser o botão mais colado
                     right: 16,
                     child: FloatingActionButton(
                       backgroundColor: Colors.white,
                       onPressed: () async {
                         final location = await LocationDatabase.getLocationById(
                           1,
-                        ); // troca o 24 pelo ID que quiser
+                        );
 
                         if (location != null) {
                           _moveToLocation(
@@ -372,5 +393,16 @@ class FullMapState extends State<FullMap> {
         );
       },
     );
+  }
+}
+
+
+class AnnotationClickListener extends OnPointAnnotationClickListener {
+  final FullMapState _state;
+  AnnotationClickListener(this._state);
+
+  @override
+  void onPointAnnotationClick(PointAnnotation annotation) {
+    _state._onAnnotationClick(annotation);
   }
 }
