@@ -146,7 +146,8 @@ class ProfileScreenState extends State<ProfileScreen> {
               Align(
                 alignment: AlignmentDirectional(0, 0),
                 child: GestureDetector(
-                  onTap: _showImageSourceDialog,
+                  // Não seleciona mais fotos de perfil !!!
+                  //onTap: _showImageSourceDialog,
                   child: Container(
                     width: 100,
                     height: 100,
@@ -169,10 +170,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                             width: 90,
                             height: 90,
                             child: _profileImagePath != null
-                                ? Image.file(
-                              File(_profileImagePath!),
-                              fit: BoxFit.cover,
-                            )
+                                ? Image.asset(_profileImagePath!)
                                 : Icon(
                               Icons.person,
                               size: 60,

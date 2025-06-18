@@ -50,6 +50,7 @@ class RootPageState extends State<RootPage> {
     final userData = await _firestoreService.getDadosUsuarioLogado();
     if (mounted && userData != null) {
       setState(() {
+        _profileImagePath = userData['foto_perfil'] ?? 'assets/profile-picture2.png';
         _profileName = userData['nome'] ?? 'Sem nome';
         _profileBio = userData['bio'] ?? '';
         _profileUsername = userData['username'] ?? 'sem_usuario'; // ADICIONADO: Carrega o username
