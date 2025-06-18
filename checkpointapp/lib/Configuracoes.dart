@@ -2,6 +2,8 @@ import 'package:checkpointapp/BancoDeDados/user_preferences_services.dart';
 import 'package:checkpointapp/Profile/configuracoes_perfil.dart';
 import 'package:checkpointapp/root.dart';
 import 'package:checkpointapp/sobre_o_app.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:checkpointapp/BancoDeDados/user_firestore_service.dart';
 
@@ -34,6 +36,14 @@ class _ConfigPageState extends State<ConfigPage> {
     Color(0xFF663399)
     */
 
+  final List<String> profileImageOptions = [
+    'assets/flamingo.png',
+    'assets/pinguim.png',
+    'assets/galinha.png',
+  ];
+
+  String _currentSelectedProfileImagePath = '';
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +53,7 @@ class _ConfigPageState extends State<ConfigPage> {
       selectedColors = List.from(prefs);
     }
     _loadInitialProfileImage();
+
   }
 
   void toggleColor(Color color) {
@@ -57,48 +68,49 @@ class _ConfigPageState extends State<ConfigPage> {
 
   // Função para carregar a imagem de perfil salva e definir como a atualmente selecionada
   Future<void> _loadInitialProfileImage() async {
-    //final savedImagePath = await UserPreferencesService.getProfileImage();
+    // Obter a foto do banco!
+    final usuarioDoc = await FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser?.uid).get();
+    final foto = usuarioDoc.data()?['foto_perfil'];
+
     setState(() {
-      // Se houver uma imagem salva, use-a. Caso contrário, _currentSelectedProfileImagePath será null.
-      //_currentSelectedProfileImagePath = savedImagePath;
+      _currentSelectedProfileImagePath =  foto;
     });
   }
 
+
   // Função para apenas *selecionar* a imagem na UI, sem salvar ainda
-  void _selectProfileImage(String imagePath) {
+  Future<void> _selectProfileImage(String imagePath) async {
+
     setState(() {
-      _currentSelectedProfileImagePath = imagePath;
+      _currentSelectedProfileImagePath =  imagePath;
     });
   }
+
 
   // Função para *salvar* a imagem de perfil selecionada
   Future<void> _saveSelectedProfileImage() async {
+
+    // A imagem tem conteudo??
     if (_currentSelectedProfileImagePath != null && _currentSelectedProfileImagePath!.isNotEmpty) {
-      //await UserPreferencesService.setProfileImage(_currentSelectedProfileImagePath!);
-      // Exibe um feedback ao usuário
+        await FirebaseFirestore.instance.collection('usuarios').doc(FirebaseAuth.instance.currentUser?.uid)
+          .set({'foto_perfil': _currentSelectedProfileImagePath}, SetOptions(merge: true));
+
+        // Exibe um feedback ao usuário
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Foto de perfil salva com sucesso!')), // Adicionado 'const'
       );
-      // Opcional: Você pode querer navegar para outra tela ou recarregar a tela principal
-      // para que a nova foto de perfil apareça imediatamente. Exemplo:
-      // Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) => const RootPage()));
+      // Recarregar a tela principal opcional(?)
+      Navigator.pushReplacement(context, MaterialPageRoute(builder: (context) =>  RootPage()));
+
+    // Exibe um feedback se nenhuma foto for selecionada
     } else {
-      // Exibe um feedback se nenhuma foto for selecionada
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Por favor, selecione uma foto de perfil.')), // Adicionado 'const'
       );
     }
   }
 
-
-
-  final List<String> profileImageOptions = [
-    'assets/flamingo.png',
-    'assets/pinguim.png',
-    'assets/galinha.png',
-  ];
-
-  String _currentSelectedProfileImagePath = '';
 
   @override
   Widget build(BuildContext context) {
@@ -172,9 +184,7 @@ class _ConfigPageState extends State<ConfigPage> {
                   child: Text('Salvar Tema'),
                   style: ElevatedButton.styleFrom(
                     minimumSize: const Size(double.infinity, 48),
-                    backgroundColor: _currentSelectedProfileImagePath != null
-                        ? UserPreferencesService.getThemeColor().first
-                        : Colors.grey,
+                    backgroundColor: UserPreferencesService.getThemeColor().first ,
                     foregroundColor: Colors.white,
                   ),
                 ),

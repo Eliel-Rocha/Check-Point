@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:geolocator/geolocator.dart'; // Para obter o ID do usuário logado
@@ -28,7 +30,7 @@ class UserFirestoreService {
         'username': username.toLowerCase(),
         'bio': 'Olá! Sou novo por aqui.',
         'data_cadastro': FieldValue.serverTimestamp(),
-        'foto_deperfil' : 'assets/images/perfil1.png'
+        'foto_perfil' : 'assets/' + (["galinha.png", "penguim.png", "flamingo.png"]..shuffle()).first,
       });
     } catch (e) {
       print('Erro ao salvar dados iniciais do usuário: $e');
@@ -162,6 +164,7 @@ class TimelineService {
       print('[ERRO] Usuário não está logado.');
       return;
     }
+
 
     print('Publicando conquista "$tituloConquista" para o usuário ${user.uid}');
 
