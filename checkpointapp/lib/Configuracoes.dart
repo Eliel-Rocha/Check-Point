@@ -40,6 +40,7 @@ class _ConfigPageState extends State<ConfigPage> {
     'assets/flamingo.png',
     'assets/pinguim.png',
     'assets/galinha.png',
+    //'assets/profile-picture2.png',      // Imagem padrão de foto de perfil
   ];
 
   String _currentSelectedProfileImagePath = '';
