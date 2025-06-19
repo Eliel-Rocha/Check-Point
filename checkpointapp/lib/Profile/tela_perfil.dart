@@ -220,8 +220,10 @@ class ProfileScreenState extends State<ProfileScreen> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
+              /*
                   Flexible(
                     child: GestureDetector(
+
                       onTap: () {
                         setState(() {
                           _isShowingAlbum = true;
@@ -244,6 +246,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                       ),
                     ),
                   ),
+               */
                   Flexible(
                     child: GestureDetector(
                       onTap: () {
@@ -271,6 +274,8 @@ class ProfileScreenState extends State<ProfileScreen> {
                 ],
               ),
               Expanded(
+                child: AchievementsGrid(),
+                /*
                 child: _isShowingAlbum
                     ? PhotoGrid(
                   photoPaths: _photoPaths,
@@ -280,6 +285,7 @@ class ProfileScreenState extends State<ProfileScreen> {
                   toggleLike: _toggleLike,
                 )
                     : AchievementsGrid(),
+                 */
               ),
             ],
           ),
