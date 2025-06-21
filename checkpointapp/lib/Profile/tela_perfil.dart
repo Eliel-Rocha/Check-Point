@@ -32,7 +32,7 @@ class ProfileScreenState extends State<ProfileScreen> {
   static const Color sunsetDarkPurple = Color(0xFF4D2973);
 
   // Estado interno da UI da tela
-  bool _isShowingAlbum = true;
+  bool _isShowingAlbum = false;
   late String _profileName;
   late String _profileBio;
   late String _profileUsername;

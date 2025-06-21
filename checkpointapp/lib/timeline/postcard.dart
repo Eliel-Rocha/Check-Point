@@ -23,21 +23,32 @@ class PostCard extends StatefulWidget {
   State<PostCard> createState() => _PostCardState();
 }
 
-  class _PostCardState extends State<PostCard> {
+class _PostCardState extends State<PostCard> {
   String _profileImageUrl = 'assets/CheckPoint.png'; // Imagem padrão
+  late List<dynamic> _likedBy;
+  late int _likes;
 
   @override
   void initState() {
     super.initState();
     _fetchProfileImage(); // Chama a função para buscar a imagem
+    _likedBy = List.from(
+      widget.post['likedBy'] ?? [],
+    ); // Copia os dados do post para essas variáveis locais
+    _likes = widget.post['likes'] ?? 0;
   }
 
   Future<void> _fetchProfileImage() async {
-    final postAuthorUid = widget.post['userId']; // <--- ESSENCIAL: PEGA O UID DO AUTOR DO POST
+    final postAuthorUid =
+        widget.post['userId']; // <--- ESSENCIAL: PEGA O UID DO AUTOR DO POST
 
     if (postAuthorUid != null && postAuthorUid.isNotEmpty) {
       try {
-        final userDoc = await FirebaseFirestore.instance.collection('usuarios').doc(postAuthorUid).get();
+        final userDoc =
+            await FirebaseFirestore.instance
+                .collection('usuarios')
+                .doc(postAuthorUid)
+                .get();
         if (userDoc.exists && userDoc.data()!.containsKey('foto_perfil')) {
           setState(() {
             _profileImageUrl = userDoc.data()!['foto_perfil'];
@@ -80,12 +91,14 @@ class PostCard extends StatefulWidget {
               children: [
                 CircleAvatar(
                   // AQUI É ONDE A MUDANÇA ACONTECE NO CIRCLEAVATAR
-                  backgroundImage: _profileImageUrl.startsWith('http')
-                      ? NetworkImage(_profileImageUrl) as ImageProvider
-                      : AssetImage(_profileImageUrl) as ImageProvider,
+                  backgroundImage:
+                      _profileImageUrl.startsWith('http')
+                          ? NetworkImage(_profileImageUrl) as ImageProvider
+                          : AssetImage(_profileImageUrl) as ImageProvider,
                   onBackgroundImageError: (exception, stackTrace) {
                     setState(() {
-                      _profileImageUrl = 'assets/CheckPoint.png'; // Volta para a imagem padrão em caso de erro
+                      _profileImageUrl =
+                          'assets/CheckPoint.png'; // Volta para a imagem padrão em caso de erro
                     });
                   },
                 ),
@@ -93,7 +106,10 @@ class PostCard extends StatefulWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      username,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     Text(handle, style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
@@ -103,14 +119,20 @@ class PostCard extends StatefulWidget {
 
           // Conquista
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 6.0,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Text(
                     caption,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -130,25 +152,53 @@ class PostCard extends StatefulWidget {
             ),
           ),
 
-
           // Conquista
           // Ações
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 8.0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
                   // Acessando toggleLike através de 'widget.'
-                  onTap: () => widget.toggleLike(widget.postIndex),
+                  onTap: () async {
+                    final user = widget.currentUser;
+
+                    setState(() {
+                      if (_likedBy.contains(user)) {
+                        _likedBy.remove(user);
+                        _likes--;
+                      } else {
+                        _likedBy.add(user);
+                        _likes++;
+                      }
+                    });
+
+                    // Atualiza no Firebase
+                    await FirebaseFirestore.instance
+                        .collection('timeline_posts')
+                        .doc(
+                          widget.post['id'],
+                        ) // Certifique-se que seu post tem esse campo 'id'
+                        .update({'likedBy': _likedBy, 'likes': _likes});
+                  },
+
                   child: Row(
                     children: [
                       Icon(
-                        likedBy.contains(widget.currentUser) ? Icons.favorite : Icons.favorite_border,
-                        color: likedBy.contains(widget.currentUser) ? Colors.red : Colors.grey,
+                        _likedBy.contains(widget.currentUser)
+                            ? Icons.favorite
+                            : Icons.favorite_border,
+                        color:
+                            _likedBy.contains(widget.currentUser)
+                                ? Colors.red
+                                : Colors.grey,
                       ),
                       const SizedBox(width: 5),
-                      Text('$likes'),
+                      Text('$_likes'),
                     ],
                   ),
                 ),
@@ -162,7 +212,9 @@ class PostCard extends StatefulWidget {
                         return Container(
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
                           ),
                           child: DraggableScrollableSheet(
                             expand: false,
@@ -184,7 +236,10 @@ class PostCard extends StatefulWidget {
                     ).then((updatedComments) {
                       if (updatedComments != null) {
                         // Acessando updateComments e postIndex através de 'widget.'
-                        widget.updateComments(widget.postIndex, updatedComments as List<Map<String, String>>);
+                        widget.updateComments(
+                          widget.postIndex,
+                          updatedComments as List<Map<String, String>>,
+                        );
                       }
                     });
                   },
