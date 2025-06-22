@@ -40,7 +40,7 @@ class FullMapState extends State<FullMap> {
 
   void _moveToLocation(double lat, double lng) {
     _mapboxMap?.setCamera(
-      CameraOptions(center: Point(coordinates: Position(lng, lat)), zoom: 14.0),
+      CameraOptions(center: Point(coordinates: Position(lng, lat)), zoom: 15.0),
     );
   }
 
@@ -414,22 +414,12 @@ class FullMapState extends State<FullMap> {
                     child: FloatingActionButton(
                       backgroundColor: Colors.white,
                       onPressed: () async {
-                        final location = await LocationDatabase.getLocationById(
-                          1,
+
+                        _moveToLocation(
+                          -19.924037282188802,
+                          -43.99294905590356,
                         );
 
-                        if (location != null) {
-                          _moveToLocation(
-                            location.latitude,
-                            location.longitude,
-                          );
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Localização não encontrada'),
-                            ),
-                          );
-                        }
                       },
                       child: const Icon(Icons.school_rounded),
                     ),
