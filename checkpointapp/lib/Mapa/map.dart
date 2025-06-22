@@ -1,4 +1,5 @@
 import 'package:checkpointapp/Mapa/location_bottom_sheet.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -8,9 +9,6 @@ import 'package:geolocator/geolocator.dart' as geo;
 import 'package:checkpointapp/BancoDeDados/localizacoes.dart';
 import 'package:checkpointapp/Mapa/search_place.dart';
 
-String token =
-    "pk.eyJ1IjoiZWxpZWxqdW5pb3IiLCJhIjoiY204M2R6d3N2MG1wMjJqb3Bvejg5M3c0cSJ9.tQgdHOalSYxxPusoxyMpFA";
-String urlStyle = "mapbox://styles/elieljunior/cm84uu252007n01qz8nxy5ds7";
 
 class FullMap extends StatefulWidget {
   const FullMap({super.key});
@@ -20,9 +18,16 @@ class FullMap extends StatefulWidget {
 }
 
 class FullMapState extends State<FullMap> {
+
+  String token = '';
+  String urlStyle = '';
+
+  late final Future<Map<String, String>> _mapboxDataFuture;
   late final Future<geo.Position?> _posFuture;
   final TextEditingController _descriptionController = TextEditingController();
+  late final Future<List<dynamic>> _initFuture;
 
+  Widget? _mapWidget;
 
   Uint8List? _defaultIcon;
   Uint8List? _selectedIcon;
@@ -148,12 +153,39 @@ class FullMapState extends State<FullMap> {
   @override
   void initState() {
     super.initState();
-    _loadIcons();
+    _mapboxDataFuture = _carregarDadosMapbox();
     _posFuture = _initLocation();
+
+    _initFuture = Future.wait([_posFuture, _mapboxDataFuture]);
+
+    _loadIcons();
     _requestPermissions();
     _checkLocationServices();
 
     //_carregarLocalizacoes();
+  }
+
+    Future<Map<String, String>> _carregarDadosMapbox() async {
+    try {
+      final doc = await FirebaseFirestore.instance.collection('codigos_API').doc('Mapbox').get();
+
+      // Pega os dados do documento
+      final data = doc.data();
+      final tokenData = data?['token'] as String? ?? '';
+      final styleData = data?['style'] as String? ?? '';
+
+      if (tokenData.isEmpty || styleData.isEmpty) {
+        throw Exception("Token ou Style estão vazios no Firebase.");
+      }
+
+      return {'token': tokenData, 'style': styleData};
+    } catch (e) {
+      if (kDebugMode) {
+        print("Erro ao carregar dados do Mapbox: $e");
+      }
+      // Lança o erro para que o FutureBuilder possa capturaro
+      rethrow;
+    }
   }
 
   Future<geo.Position?> _initLocation() async {
@@ -243,23 +275,39 @@ class FullMapState extends State<FullMap> {
 
   @override
   Widget build(BuildContext context) {
-    MapboxOptions.setAccessToken(token);
 
-    return FutureBuilder<geo.Position?>(
-      future: _posFuture,
+    return FutureBuilder<List<dynamic>>(
+      future: _initFuture,
       builder: (context, snap) {
         //Conferindo localização
-        if (snap.connectionState != ConnectionState.done) {
+        if ((snap.connectionState != ConnectionState.done)) {
           return const Center(child: CircularProgressIndicator());
         }
-        if (snap.data == null) {
-          return const Center(
-            child: Text("Não foi possível obter localização."),
+
+        if (snap.hasError || !snap.hasData) {
+          return Scaffold(
+            body: Center(
+              child: Text("Erro ao carregar dados: ${snap.error}"),
+            ),
           );
         }
 
-        geo.Position pos = snap.data!;
+        final results = snap.data!;
+        final geo.Position? pos = results[0];
+        final Map<String, String> mapboxData = results[1];
 
+        if (pos == null || mapboxData['token']!.isEmpty) {
+          return const Scaffold(
+            body: Center(child: Text("Não foi possível obter a localização ou o token do mapa.")),
+          );
+        }
+
+        token = mapboxData['token']!;
+        urlStyle = mapboxData['style']!;
+        MapboxOptions.setAccessToken(token);
+
+        //if (_mapWidget == null) {
+        //_mapWidget =
         return Scaffold(
           body: Stack(
             children: [
@@ -391,7 +439,12 @@ class FullMapState extends State<FullMap> {
             ],
           ),
         );
+      /*}else{}
+
+        // RETORNA O WIDGET CARREGADO
+        return _mapWidget!;*/
       },
+
     );
   }
 }
