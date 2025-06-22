@@ -150,14 +150,17 @@ class _AchievementsGridState extends State<AchievementsGrid> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      achievement['imagePath'],
-                      height: 80,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Se a imagem não for encontrada no caminho especificado, mostra um ícone de erro
-                        return Icon(Icons.error_outline, size: 80, color: Colors.red);
-                      },
-                    ),
+                Expanded(
+                  child:
+                      Image.asset(
+                        achievement['imagePath'],
+                        //height: 70,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Se a imagem não for encontrada no caminho especificado, mostra um ícone de erro
+                          return Icon(Icons.error_outline, size: 80, color: Colors.red);
+                        },
+                      )),
                     SizedBox(height: 8),
                     Text(
                       achievement['title'],
@@ -168,7 +171,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
                     Text(
                       achievement['description'],
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 13),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
