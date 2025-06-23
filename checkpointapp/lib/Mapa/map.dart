@@ -40,7 +40,7 @@ class FullMapState extends State<FullMap> {
 
   void _moveToLocation(double lat, double lng) {
     _mapboxMap?.setCamera(
-      CameraOptions(center: Point(coordinates: Position(lng, lat)), zoom: 15.0),
+      CameraOptions(center: Point(coordinates: Position(lng, lat)), zoom: 15.5),
     );
   }
 

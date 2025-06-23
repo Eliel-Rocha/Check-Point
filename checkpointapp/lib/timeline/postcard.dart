@@ -24,7 +24,7 @@ class PostCard extends StatefulWidget {
 }
 
 class _PostCardState extends State<PostCard> {
-  String _profileImageUrl = 'assets/CheckPoint.png'; // Imagem padrão
+  String _profileImageUrl = 'assets/profile-picture2.png'; // Imagem padrão
   late List<dynamic> _likedBy;
   late int _likes;
 
@@ -72,11 +72,6 @@ class _PostCardState extends State<PostCard> {
     final comments = widget.post['comments'] ?? [];
     final time = widget.post['time'] ?? '';
 
-    //********************************************************************************************
-    // TODO: Lógica limpa que busca os dados do usuario de acordo com o UID fornecido
-    // DEVERIA ESTAR no init state??
-    //final usuarioDoc = await FirebaseFirestore.instance.collection('usuarios').doc(currentUser.uid).get();
-    //final foto = usuarioDoc.data()?['foto_perfil'] ?? 'assets/profile-picture2.png';
 
     return Card(
       margin: const EdgeInsets.all(10),
@@ -98,7 +93,7 @@ class _PostCardState extends State<PostCard> {
                   onBackgroundImageError: (exception, stackTrace) {
                     setState(() {
                       _profileImageUrl =
-                          'assets/CheckPoint.png'; // Volta para a imagem padrão em caso de erro
+                          'assets/profile-picture2.png'; // Volta para a imagem padrão em caso de erro
                     });
                   },
                 ),
