@@ -88,4 +88,11 @@ class DefaultFirebaseOptions {
     measurementId: 'G-BRZPGNZ7N1',
   );
 
+  /*"Ao contrário de como as chaves de API são normalmente usadas,as chaves
+   de API para serviços do Firebase não são usadas para controlar o acesso aos recursos do back-end;
+   isso é feito pelas Regras de Segurança do Firebase... Por essa razão,
+   não há problema em incluir as chaves de API para serviços do Firebase no código do cliente."
+
+    https://firebase.google.com/docs/projects/api-keys*/
+
 }
