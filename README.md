@@ -71,9 +71,38 @@ Saiba mais sobre os ODS: [https://brasil.un.org/pt-br/sdgs](https://brasil.un.or
 
 ---
 
+## 📱 Arquitetura do projeto
+
+<p align="center">
+  <img src="assets/C4_Architecture.jpg" width="800" alt="Arquitetura C4 do Projeto">
+</p>
+
+---
+
 ## 📸 Capturas de tela
 
-*****
+
+| 1. Página Inicial | 2. Tela de Login | 3. Tela de Cadastro |
+| :---: | :---: | :---: |
+| <img src="assets/pagina_inicial.jpg" width="260" alt="Página Inicial de Boas-Vindas"> | <img src="assets/login.jpg" width="260" alt="Tela de Login"> | <img src="assets/cadastro.jpg" width="260" alt="Tela de Cadastro de Usuário"> |
+
+<br>
+
+| 4. Timeline Social | 5. Tela de Comentários | 6. Mapa Interativo |
+| :---: | :---: | :---: |
+| <img src="assets/timeline.jpg" width="260" alt="Timeline com postagens"> | <img src="assets/comentarios.jpg" width="260" alt="Tela de Comentários de um post"> | <img src="assets/mapa_puc.jpg" width="260" alt="Mapa com pontos de interesse"> |
+
+<br>
+
+| 7. Interação no Mapa (Pin) | 8. Pin Selecionado | 9. Perfil do Usuário |
+| :---: | :---: | :---: |
+| <img src="assets/pin_nao_selecionado.jpg" width="260" alt="Marcador não selecionado no mapa"> | <img src="assets/pin_selecionado.jpg" width="260" alt="Marcador selecionado com detalhes"> | <img src="assets/perfil.jpg" width="260" alt="Tela de Perfil do Usuário"> |
+
+<br>
+
+| 10. Edição de Perfil | 11. Configurações Gerais | 12. Recuperação de Senha |
+| :---: | :---: | :---: |
+| <img src="assets/configuracoes_perfil.jpg" width="260" alt="Tela de Edição de Perfil"> | <img src="assets/configuracoes.jpg" width="260" alt="Tela de Configurações do App"> | <img src="assets/esqueceu_senha.jpg" width="260" alt="Tela de Recuperação de Senha"> |
 
 
 
