@@ -258,58 +258,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                 ),
               ),
-
-              SizedBox(height: 10),
-
-              // Botão login com Facebook (ainda sem ação)
-              Container(
-                height: 60,
-                alignment: Alignment.centerLeft,
-                decoration: BoxDecoration(
-                  color: Color(0xFF3C5A99),
-                  borderRadius: BorderRadius.all(Radius.circular(5)),
-                ),
-                child: SizedBox.expand(
-                  child: TextButton(
-                    onPressed: () {}, // implementar depois
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Text(
-                          "Login com Facebook",
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                            fontSize: 20,
-                          ),
-                          textAlign: TextAlign.left,
-                        ),
-                        Container(
-                          height: 28,
-                          width: 28,
-                          child: Image.asset("assets/fb-icon.png"),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-
-              SizedBox(height: 10),
-
-              // Botão cadastrar
-              Container(
-                height: 40,
-                child: TextButton(
-                  child: Text("Cadastre-se", textAlign: TextAlign.center),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => SignupPage()),
-                    );
-                  },
-                ),
-              ),
             ],
           ),
         ),

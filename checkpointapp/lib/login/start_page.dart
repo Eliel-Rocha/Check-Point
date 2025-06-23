@@ -156,58 +156,6 @@ class _StartPageState extends State<StartPage> {
                     ),
                   ),
                 ),
-                // Entrar com  ______________________________________________________________________________________________________
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(16, 0, 16, 16),
-                  child: Text(
-                    'entrar com',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontFamily: 'Plus Jakarta Sans',
-                      color: Color(0xFF57636C),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                      decoration: TextDecoration.none, // tirar o sublinhado
-                    ),
-                  ),
-                ),
-                // Entrar com FACEBOOK ______________________________________________________________________________________________
-                Padding(
-                  padding: EdgeInsetsDirectional.fromSTEB(0, 0, 0, 8),
-                  child: Container(
-                    width: screenWidth * 0.6, // 70% da largura da tela
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.pushNamed(context, StartPage.routeName);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF3C5A99),
-                        padding: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        side: BorderSide(
-                          color: Color(0xFF3C5A99),
-                          width: 2,
-                        ),
-                      ),
-                      icon: Image.asset(
-                        "assets/fb-icon.png",
-                        width: 20,
-                        height: 20,
-                      ),
-                      label: Text(
-                        'Login com o Facebook',
-                        style: TextStyle(
-                          fontFamily: 'Plus Jakarta Sans',
-                          color: Colors.white,
-                          fontSize: 12,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
               ],
             ),
           ),
