@@ -16,6 +16,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Map<String, dynamic>> userAchievements = [];
+  List<int> conquistadosIds = [];
   bool isLoading = true;
 
   @override
@@ -37,10 +38,20 @@ class _AchievementsGridState extends State<AchievementsGrid> {
       int? predioProximo = await userService.verificarProximidadeComPredios(
         latitude: latitudeAtual,
         longitude: longitudeAtual,
-        raioMetros: 50, // ajustar conforme necessário
+        raioMetros: 20, // ajustar conforme necessário
       );
 
       if (predioProximo != null) {
+
+        // 1 verificando se a conquista já foi conquistada
+        if (conquistadosIds.contains(predioProximo)) {
+          // Se já tem, apenas mostra a mensagem e para.
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Você já conquistou este prédio!')),
+          );
+          return; // Para a execução do método aqui
+        }
+        // 2. SE NÃO TEM, EXECUTA TODA A LÓGICA DE NOVA CONQUISTA
         await userService.adicionarPredioConquistado(predioProximo);
 
         // Obtem dados do prédio para o post
@@ -87,13 +98,14 @@ class _AchievementsGridState extends State<AchievementsGrid> {
       if (dadosUsuario == null || !dadosUsuario.containsKey('conquistas')) {
         setState(() {
           userAchievements = [];
+          conquistadosIds = [];
           isLoading = false;
         });
         return;
       }
 
-      // Corrigido aqui: campo era 'Conquitas' errado + agora trata null
       List<dynamic> prediosConquistados = dadosUsuario['conquistas'] ?? [];
+      List<int> ids = List<int>.from(prediosConquistados);
       List<Map<String, dynamic>> conquistas = [];
 
 
@@ -111,12 +123,14 @@ class _AchievementsGridState extends State<AchievementsGrid> {
 
       setState(() {
         userAchievements = conquistas;
+        conquistadosIds = ids;
         isLoading = false;
       });
     } catch (e) {
       print('Erro ao carregar conquistas: $e');
       setState(() {
         userAchievements = [];
+        conquistadosIds = [];
         isLoading = false;
       });
     }
@@ -150,14 +164,17 @@ class _AchievementsGridState extends State<AchievementsGrid> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset(
-                      achievement['imagePath'],
-                      height: 80,
-                      errorBuilder: (context, error, stackTrace) {
-                        // Se a imagem não for encontrada no caminho especificado, mostra um ícone de erro
-                        return Icon(Icons.error_outline, size: 80, color: Colors.red);
-                      },
-                    ),
+                Expanded(
+                  child:
+                      Image.asset(
+                        achievement['imagePath'],
+                        //height: 70,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          // Se a imagem não for encontrada no caminho especificado, mostra um ícone de erro
+                          return Icon(Icons.error_outline, size: 80, color: Colors.red);
+                        },
+                      )),
                     SizedBox(height: 8),
                     Text(
                       achievement['title'],
@@ -168,7 +185,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
                     Text(
                       achievement['description'],
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 13),
+                      style: TextStyle(fontSize: 12),
                     ),
                   ],
                 ),
@@ -179,11 +196,24 @@ class _AchievementsGridState extends State<AchievementsGrid> {
         Positioned(
           bottom: 20,
           right: 20,
-          child: FloatingActionButton(
-            child: Icon(Icons.location_on),
+          child: FloatingActionButton.extended(
             onPressed: () async {
               await testarConquistaPorLocalizacao();
             },
+            backgroundColor: Color(0xFF663399).withOpacity(0.50),
+            foregroundColor: Colors.white,
+            shape: StadiumBorder(),
+            elevation: 8.0,
+
+            // Ícone e Texto
+            icon: Icon(Icons.location_on),
+            label: Text(
+              'Conquistar Local',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
           ),
         ),
       ],

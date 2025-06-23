@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class PostCard extends StatefulWidget {
   final Map<String, dynamic> post;
   final int postIndex;
-  final String currentUser;
+  final String currentUser;   // Nome do usuário logado
+  final String currentUserId; // ID do usuário logado (ESSENCIAL PARA LIKES)
   final Function(int, List<Map<String, String>>) updateComments;
   final Function(int) toggleLike;
 
@@ -15,6 +16,7 @@ class PostCard extends StatefulWidget {
     required this.post,
     required this.postIndex,
     required this.currentUser,
+    required this.currentUserId,
     required this.updateComments,
     required this.toggleLike,
   });
@@ -23,8 +25,10 @@ class PostCard extends StatefulWidget {
   State<PostCard> createState() => _PostCardState();
 }
 
-  class _PostCardState extends State<PostCard> {
+class _PostCardState extends State<PostCard> {
   String _profileImageUrl = 'assets/CheckPoint.png'; // Imagem padrão
+  late List<dynamic> _likedBy;
+  late int _likes;
 
   @override
   void initState() {
@@ -32,12 +36,26 @@ class PostCard extends StatefulWidget {
     _fetchProfileImage(); // Chama a função para buscar a imagem
   }
 
+  @override
+  void didUpdateWidget(covariant PostCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Se, por algum motivo, o autor do post mudar, busca a nova imagem.
+    if (widget.post['userId'] != oldWidget.post['userId']) {
+      _fetchProfileImage();
+    }
+  }
+
   Future<void> _fetchProfileImage() async {
-    final postAuthorUid = widget.post['userId']; // <--- ESSENCIAL: PEGA O UID DO AUTOR DO POST
+    final postAuthorUid =
+        widget.post['userId']; // <--- ESSENCIAL: PEGA O UID DO AUTOR DO POST
 
     if (postAuthorUid != null && postAuthorUid.isNotEmpty) {
       try {
-        final userDoc = await FirebaseFirestore.instance.collection('usuarios').doc(postAuthorUid).get();
+        final userDoc =
+            await FirebaseFirestore.instance
+                .collection('usuarios')
+                .doc(postAuthorUid)
+                .get();
         if (userDoc.exists && userDoc.data()!.containsKey('foto_perfil')) {
           setState(() {
             _profileImageUrl = userDoc.data()!['foto_perfil'];
@@ -56,10 +74,12 @@ class PostCard extends StatefulWidget {
     final handle = widget.post['handle'] ?? '@usuario';
     final caption = widget.post['caption'] ?? '';
     final imagePath = widget.post['image'] ?? 'assets/CheckPoint.png';
-    final likedBy = (widget.post['likedBy'] ?? []) as List;
+    final List<dynamic> likedBy = List.from(widget.post['likedBy'] ?? []);
     final likes = widget.post['likes'] ?? 0;
     final comments = widget.post['comments'] ?? [];
     final time = widget.post['time'] ?? '';
+
+    final bool isLikedByCurrentUser = likedBy.contains(widget.currentUserId);
 
     //********************************************************************************************
     // TODO: Lógica limpa que busca os dados do usuario de acordo com o UID fornecido
@@ -80,12 +100,14 @@ class PostCard extends StatefulWidget {
               children: [
                 CircleAvatar(
                   // AQUI É ONDE A MUDANÇA ACONTECE NO CIRCLEAVATAR
-                  backgroundImage: _profileImageUrl.startsWith('http')
-                      ? NetworkImage(_profileImageUrl) as ImageProvider
-                      : AssetImage(_profileImageUrl) as ImageProvider,
+                  backgroundImage:
+                      _profileImageUrl.startsWith('http')
+                          ? NetworkImage(_profileImageUrl) as ImageProvider
+                          : AssetImage(_profileImageUrl) as ImageProvider,
                   onBackgroundImageError: (exception, stackTrace) {
                     setState(() {
-                      _profileImageUrl = 'assets/CheckPoint.png'; // Volta para a imagem padrão em caso de erro
+                      _profileImageUrl =
+                          'assets/CheckPoint.png'; // Volta para a imagem padrão em caso de erro
                     });
                   },
                 ),
@@ -93,7 +115,10 @@ class PostCard extends StatefulWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(username, style: const TextStyle(fontWeight: FontWeight.bold)),
+                    Text(
+                      username,
+                      style: const TextStyle(fontWeight: FontWeight.bold),
+                    ),
                     Text(handle, style: const TextStyle(color: Colors.grey)),
                   ],
                 ),
@@ -103,14 +128,20 @@ class PostCard extends StatefulWidget {
 
           // Conquista
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 6.0,
+            ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 Expanded(
                   child: Text(
                     caption,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w500,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 10),
@@ -130,22 +161,25 @@ class PostCard extends StatefulWidget {
             ),
           ),
 
-
           // Conquista
           // Ações
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 8.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10.0,
+              vertical: 8.0,
+            ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  // Acessando toggleLike através de 'widget.'
+                  // A CORREÇÃO: Apenas chama a função do widget pai.
+                  // A tela pai (TimelineScreen) cuidará de toda a lógica.
                   onTap: () => widget.toggleLike(widget.postIndex),
                   child: Row(
                     children: [
                       Icon(
-                        likedBy.contains(widget.currentUser) ? Icons.favorite : Icons.favorite_border,
-                        color: likedBy.contains(widget.currentUser) ? Colors.red : Colors.grey,
+                        isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                        color: isLikedByCurrentUser ? Colors.red : Colors.grey,
                       ),
                       const SizedBox(width: 5),
                       Text('$likes'),
@@ -162,7 +196,9 @@ class PostCard extends StatefulWidget {
                         return Container(
                           decoration: const BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                            borderRadius: BorderRadius.vertical(
+                              top: Radius.circular(20),
+                            ),
                           ),
                           child: DraggableScrollableSheet(
                             expand: false,
@@ -184,7 +220,10 @@ class PostCard extends StatefulWidget {
                     ).then((updatedComments) {
                       if (updatedComments != null) {
                         // Acessando updateComments e postIndex através de 'widget.'
-                        widget.updateComments(widget.postIndex, updatedComments as List<Map<String, String>>);
+                        widget.updateComments(
+                          widget.postIndex,
+                          updatedComments as List<Map<String, String>>,
+                        );
                       }
                     });
                   },

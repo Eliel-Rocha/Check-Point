@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'conquistas.dart';
 import 'grade_de_fotos.dart';
 
-
 class ProfileScreen extends StatefulWidget {
   final String name;
   final String bio;
@@ -32,7 +31,6 @@ class ProfileScreenState extends State<ProfileScreen> {
   static const Color sunsetDarkPurple = Color(0xFF4D2973);
 
   // Estado interno da UI da tela
-  bool _isShowingAlbum = true;
   late String _profileName;
   late String _profileBio;
   late String _profileUsername;
@@ -70,65 +68,6 @@ class ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // Métodos para a galeria de fotos local (sem conexão com banco de dados ainda)
-  void _addPhoto(String path) {
-    setState(() {
-      _photoPaths.add(path);
-      _likes.add(false);
-    });
-  }
-
-  void _removePhoto(int index) {
-    setState(() {
-      _photoPaths.removeAt(index);
-      _likes.removeAt(index);
-    });
-  }
-
-  void _toggleLike(int index) {
-    setState(() {
-      _likes[index] = !_likes[index];
-    });
-  }
-
-  Future<void> _pickImage(ImageSource source) async {
-    final pickedFile = await _picker.pickImage(source: source);
-    if (pickedFile != null) {
-      setState(() {
-        _profileImagePath = pickedFile.path;
-        // Futuramente, esta ação também chamaria um método para salvar
-        // a imagem no Firebase Storage e atualizar a URL no Firestore.
-      });
-    }
-  }
-
-  Future<void> _showImageSourceDialog() async {
-    await showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Selecionar Imagem'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('Câmera'),
-              onPressed: () {
-                _pickImage(ImageSource.camera);
-                Navigator.of(context).pop();
-              },
-            ),
-            TextButton(
-              child: Text('Galeria'),
-              onPressed: () {
-                _pickImage(ImageSource.gallery);
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -136,45 +75,69 @@ class ProfileScreenState extends State<ProfileScreen> {
         FocusScope.of(context).unfocus();
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
-        body: SafeArea(
-          top: true,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              SizedBox(height: 20),
-              Align(
-                alignment: AlignmentDirectional(0, 0),
-                child: GestureDetector(
-                  // Não seleciona mais fotos de perfil !!!
-                  //onTap: _showImageSourceDialog,
-                  child: Container(
-                    width: 100,
-                    height: 100,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: SweepGradient(
-                        colors: [sunsetPurple, sunsetOrange, sunsetPurple],
-                        stops: [0.0, 0.5, 1.0],
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(5.0),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          color: Colors.white,
+        body: Container(
+          width:
+              double.infinity, // Garante que o container ocupe toda a largura
+          height:
+              double.infinity, // Garante que o container ocupe toda a altura
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFE1BEE7), // Mantém o lavanda suave
+                const Color(0xFFFFE0B2),  // Transita para o seu laranja claro na base
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            image: DecorationImage(
+              // Caminho para a imagem que você adicionou
+              image: AssetImage('assets/mapadefundo.png'),
+              // Faz a imagem se repetir para preencher todo o fundo
+              repeat: ImageRepeat.repeat,
+              // MUITO IMPORTANTE: Deixa a imagem bem sutil e transparente
+              opacity: 0.05,
+            ),
+          ),
+          child: SafeArea(
+            top: true,
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                SizedBox(height: 20),
+                Align(
+                  alignment: AlignmentDirectional(0, 0),
+                  child: GestureDetector(
+                    // Não seleciona mais fotos de perfil !!!
+                    //onTap: _showImageSourceDialog,
+                    child: Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        gradient: SweepGradient(
+                          colors: [sunsetPurple, sunsetOrange, sunsetPurple],
+                          stops: [0.0, 0.5, 1.0],
                         ),
-                        child: ClipOval(
-                          child: SizedBox(
-                            width: 90,
-                            height: 90,
-                            child: _profileImagePath != null
-                                ? Image.asset(_profileImagePath!)
-                                : Icon(
-                              Icons.person,
-                              size: 60,
-                              color: Colors.grey,
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(5.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white,
+                          ),
+                          child: ClipOval(
+                            child: SizedBox(
+                              width: 90,
+                              height: 90,
+                              child:
+                                  _profileImagePath != null
+                                      ? Image.asset(_profileImagePath!)
+                                      : Icon(
+                                        Icons.person,
+                                        size: 60,
+                                        color: Colors.grey,
+                                      ),
                             ),
                           ),
                         ),
@@ -182,106 +145,69 @@ class ProfileScreenState extends State<ProfileScreen> {
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 12),
-              Text(
-                _profileName,
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  color: sunsetDarkPurple,
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              SizedBox(height: 4),
-              Text(
-                '@$_profileUsername',
-                style: TextStyle(
-                  fontFamily: 'Inter',
-                  color: Colors.grey.shade600,
-                  fontSize: 16,
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 20.0,
-                  vertical: 10.0,
-                ),
-                child: Text(
-                  _profileBio,
-                  textAlign: TextAlign.center,
+                SizedBox(height: 4),
+                Text(
+                  _profileName.isNotEmpty ? _profileName : 'Nome',
                   style: TextStyle(
                     fontFamily: 'Inter',
-                    color: Colors.black87,
+                    color: sunsetDarkPurple,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                SizedBox(height: 2),
+                Text(
+                  '@$_profileUsername',
+                  style: TextStyle(
+                    fontFamily: 'Inter',
+                    color: Colors.grey.shade600,
                     fontSize: 16,
                   ),
                 ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: [
-                  Flexible(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isShowingAlbum = true;
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          Icon(Icons.photo_album,
-                              color:
-                              _isShowingAlbum ? sunsetOrange : Colors.grey),
-                          Text(
-                            'Álbum',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              color:
-                              _isShowingAlbum ? sunsetOrange : Colors.grey,
-                            ),
-                          ),
-                        ],
-                      ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0,
+                    vertical: 10.0,
+                  ),
+                  child: Text(
+                    _profileBio,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontFamily: 'Inter',
+                      color: Colors.black87,
+                      fontSize: 16,
                     ),
                   ),
-                  Flexible(
-                    child: GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _isShowingAlbum = false;
-                        });
-                      },
-                      child: Column(
-                        children: [
-                          Icon(Icons.star,
-                              color:
-                              !_isShowingAlbum ? sunsetYellow : Colors.grey),
-                          Text(
-                            'Medalhas',
-                            style: TextStyle(
-                              fontFamily: 'Inter',
-                              color:
-                              !_isShowingAlbum ? sunsetYellow : Colors.grey,
-                            ),
-                          ),
-                        ],
+                ),
+                // --- A ESTRUTURA ANTIGA (ROW E FLEXIBLE) FOI SUBSTITUÍDA POR ESTA ---
+                Column(
+                  children: [
+                    SizedBox(height: 4),
+                    Text(
+                      'Medalhas',
+                      style: TextStyle(
+                        fontFamily: 'Inter',
+                        fontWeight: FontWeight.bold,
+                        color: Colors.deepPurple,
+                        fontSize: 16,
                       ),
                     ),
-                  ),
-                ],
-              ),
-              Expanded(
-                child: _isShowingAlbum
-                    ? PhotoGrid(
-                  photoPaths: _photoPaths,
-                  likes: _likes,
-                  addPhoto: _addPhoto,
-                  removePhoto: _removePhoto,
-                  toggleLike: _toggleLike,
-                )
-                    : AchievementsGrid(),
-              ),
-            ],
+                    SizedBox(height: 8),
+                    Container(
+                      height: 4, // Altura (espessura) da linha
+                      width: 50, // Largura da linha
+                      decoration: BoxDecoration(
+                        color: Colors.deepPurple, // A cor da linha
+                        borderRadius: BorderRadius.circular(2),
+                      ),
+                    ),
+                  ],
+                ),
+                Expanded(
+                  child: AchievementsGrid(),
+                ),
+              ],
+            ),
           ),
         ),
       ),
