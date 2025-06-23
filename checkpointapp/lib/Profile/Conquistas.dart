@@ -104,7 +104,6 @@ class _AchievementsGridState extends State<AchievementsGrid> {
         return;
       }
 
-      // Corrigido aqui: campo era 'Conquitas' errado + agora trata null
       List<dynamic> prediosConquistados = dadosUsuario['conquistas'] ?? [];
       List<int> ids = List<int>.from(prediosConquistados);
       List<Map<String, dynamic>> conquistas = [];
@@ -197,11 +196,24 @@ class _AchievementsGridState extends State<AchievementsGrid> {
         Positioned(
           bottom: 20,
           right: 20,
-          child: FloatingActionButton(
-            child: Icon(Icons.location_on),
+          child: FloatingActionButton.extended(
             onPressed: () async {
               await testarConquistaPorLocalizacao();
             },
+            backgroundColor: Color(0xFF663399).withOpacity(0.50),
+            foregroundColor: Colors.white,
+            shape: StadiumBorder(),
+            elevation: 8.0,
+
+            // Ícone e Texto
+            icon: Icon(Icons.location_on),
+            label: Text(
+              'Conquistar Local',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.2,
+              ),
+            ),
           ),
         ),
       ],
