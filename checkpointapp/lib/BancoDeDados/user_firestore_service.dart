@@ -30,7 +30,7 @@ class UserFirestoreService {
         'username': username.toLowerCase(),
         'bio': 'Olá! Sou novo por aqui.',
         'data_cadastro': FieldValue.serverTimestamp(),
-        'foto_perfil' : 'assets/' + (["galinha.png", "penguim.png", "flamingo.png"]..shuffle()).first,    // pegar uma foto de perfil aleatoria
+        'foto_perfil' : 'assets/' + (["galinha.png", "pinguim.png", "flamingo.png"]..shuffle()).first,    // pegar uma foto de perfil aleatoria
       });
     } catch (e) {
       print('Erro ao salvar dados iniciais do usuário: $e');
@@ -176,7 +176,7 @@ class TimelineService {
       'username': nomeUsuario,
       'handle': '@$handleUsuario',
       'userId': user.uid,
-      'caption': 'Acabei de conquistar: $tituloConquista! 🏆',
+      'caption': 'Acabei de conquistar $tituloConquista 🏆',
       'likes': 0,
       'likedBy': [],
       'commentsNum': 0,

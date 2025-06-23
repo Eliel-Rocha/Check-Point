@@ -139,7 +139,7 @@ class _PostCardState extends State<PostCard> {
                   child: Text(
                     caption,
                     style: const TextStyle(
-                      fontSize: 16,
+                      fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -161,7 +161,7 @@ class _PostCardState extends State<PostCard> {
             ),
           ),
 
-          // Conquista
+          // pub
           // Ações
           Padding(
             padding: const EdgeInsets.symmetric(
