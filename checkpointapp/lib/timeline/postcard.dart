@@ -6,7 +6,8 @@ import 'package:flutter/material.dart';
 class PostCard extends StatefulWidget {
   final Map<String, dynamic> post;
   final int postIndex;
-  final String currentUser;
+  final String currentUser;   // Nome do usuário logado
+  final String currentUserId; // ID do usuário logado (ESSENCIAL PARA LIKES)
   final Function(int, List<Map<String, String>>) updateComments;
   final Function(int) toggleLike;
 
@@ -15,6 +16,7 @@ class PostCard extends StatefulWidget {
     required this.post,
     required this.postIndex,
     required this.currentUser,
+    required this.currentUserId,
     required this.updateComments,
     required this.toggleLike,
   });
@@ -32,10 +34,15 @@ class _PostCardState extends State<PostCard> {
   void initState() {
     super.initState();
     _fetchProfileImage(); // Chama a função para buscar a imagem
-    _likedBy = List.from(
-      widget.post['likedBy'] ?? [],
-    ); // Copia os dados do post para essas variáveis locais
-    _likes = widget.post['likes'] ?? 0;
+  }
+
+  @override
+  void didUpdateWidget(covariant PostCard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    // Se, por algum motivo, o autor do post mudar, busca a nova imagem.
+    if (widget.post['userId'] != oldWidget.post['userId']) {
+      _fetchProfileImage();
+    }
   }
 
   Future<void> _fetchProfileImage() async {
@@ -67,10 +74,12 @@ class _PostCardState extends State<PostCard> {
     final handle = widget.post['handle'] ?? '@usuario';
     final caption = widget.post['caption'] ?? '';
     final imagePath = widget.post['image'] ?? 'assets/CheckPoint.png';
-    final likedBy = (widget.post['likedBy'] ?? []) as List;
+    final List<dynamic> likedBy = List.from(widget.post['likedBy'] ?? []);
     final likes = widget.post['likes'] ?? 0;
     final comments = widget.post['comments'] ?? [];
     final time = widget.post['time'] ?? '';
+
+    final bool isLikedByCurrentUser = likedBy.contains(widget.currentUserId);
 
     //********************************************************************************************
     // TODO: Lógica limpa que busca os dados do usuario de acordo com o UID fornecido
@@ -163,42 +172,17 @@ class _PostCardState extends State<PostCard> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 GestureDetector(
-                  // Acessando toggleLike através de 'widget.'
-                  onTap: () async {
-                    final user = widget.currentUser;
-
-                    setState(() {
-                      if (_likedBy.contains(user)) {
-                        _likedBy.remove(user);
-                        _likes--;
-                      } else {
-                        _likedBy.add(user);
-                        _likes++;
-                      }
-                    });
-
-                    // Atualiza no Firebase
-                    await FirebaseFirestore.instance
-                        .collection('timeline_posts')
-                        .doc(
-                          widget.post['id'],
-                        ) // Certifique-se que seu post tem esse campo 'id'
-                        .update({'likedBy': _likedBy, 'likes': _likes});
-                  },
-
+                  // A CORREÇÃO: Apenas chama a função do widget pai.
+                  // A tela pai (TimelineScreen) cuidará de toda a lógica.
+                  onTap: () => widget.toggleLike(widget.postIndex),
                   child: Row(
                     children: [
                       Icon(
-                        _likedBy.contains(widget.currentUser)
-                            ? Icons.favorite
-                            : Icons.favorite_border,
-                        color:
-                            _likedBy.contains(widget.currentUser)
-                                ? Colors.red
-                                : Colors.grey,
+                        isLikedByCurrentUser ? Icons.favorite : Icons.favorite_border,
+                        color: isLikedByCurrentUser ? Colors.red : Colors.grey,
                       ),
                       const SizedBox(width: 5),
-                      Text('$_likes'),
+                      Text('$likes'),
                     ],
                   ),
                 ),

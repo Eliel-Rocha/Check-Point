@@ -90,13 +90,17 @@ class _TimelineScreenState extends State<TimelineScreen> {
             itemBuilder: (context, index) {
               final doc = docs[index];
               final post = doc.data() as Map<String, dynamic>;
+              post['id'] = doc.id;
 
               return PostCard(
                 post: post,
                 postIndex: index,
                 currentUser: currentUserName, //currentUserName
+                currentUserId: currentUserId,
                 updateComments: (i, list) => updateComments(doc.id, list),
+
                 toggleLike: (i) => toggleLike(doc.id, post['likedBy'] ?? [], post['likes'] ?? 0),
+
               );
             },
           );
