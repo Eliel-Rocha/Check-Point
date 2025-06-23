@@ -30,7 +30,7 @@ class UserFirestoreService {
         'username': username.toLowerCase(),
         'bio': 'Olá! Sou novo por aqui.',
         'data_cadastro': FieldValue.serverTimestamp(),
-        'foto_perfil' : 'assets/' + (["galinha.png", "penguim.png", "flamingo.png"]..shuffle()).first,    // pegar uma foto de perfil aleatoria
+        'foto_perfil' : 'assets/' + (["galinha.png", "pinguim.png", "flamingo.png"]..shuffle()).first,    // pegar uma foto de perfil aleatoria
       });
     } catch (e) {
       print('Erro ao salvar dados iniciais do usuário: $e');
