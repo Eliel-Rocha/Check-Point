@@ -16,6 +16,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   List<Map<String, dynamic>> userAchievements = [];
+  List<int> conquistadosIds = [];
   bool isLoading = true;
 
   @override
@@ -37,10 +38,20 @@ class _AchievementsGridState extends State<AchievementsGrid> {
       int? predioProximo = await userService.verificarProximidadeComPredios(
         latitude: latitudeAtual,
         longitude: longitudeAtual,
-        raioMetros: 50, // ajustar conforme necessário
+        raioMetros: 20, // ajustar conforme necessário
       );
 
       if (predioProximo != null) {
+
+        // 1 verificando se a conquista já foi conquistada
+        if (conquistadosIds.contains(predioProximo)) {
+          // Se já tem, apenas mostra a mensagem e para.
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Você já conquistou este prédio!')),
+          );
+          return; // Para a execução do método aqui
+        }
+        // 2. SE NÃO TEM, EXECUTA TODA A LÓGICA DE NOVA CONQUISTA
         await userService.adicionarPredioConquistado(predioProximo);
 
         // Obtem dados do prédio para o post
@@ -87,6 +98,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
       if (dadosUsuario == null || !dadosUsuario.containsKey('conquistas')) {
         setState(() {
           userAchievements = [];
+          conquistadosIds = [];
           isLoading = false;
         });
         return;
@@ -94,6 +106,7 @@ class _AchievementsGridState extends State<AchievementsGrid> {
 
       // Corrigido aqui: campo era 'Conquitas' errado + agora trata null
       List<dynamic> prediosConquistados = dadosUsuario['conquistas'] ?? [];
+      List<int> ids = List<int>.from(prediosConquistados);
       List<Map<String, dynamic>> conquistas = [];
 
 
@@ -111,12 +124,14 @@ class _AchievementsGridState extends State<AchievementsGrid> {
 
       setState(() {
         userAchievements = conquistas;
+        conquistadosIds = ids;
         isLoading = false;
       });
     } catch (e) {
       print('Erro ao carregar conquistas: $e');
       setState(() {
         userAchievements = [];
+        conquistadosIds = [];
         isLoading = false;
       });
     }

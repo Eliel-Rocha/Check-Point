@@ -185,7 +185,7 @@ class ProfileScreenState extends State<ProfileScreen> {
               ),
               SizedBox(height: 12),
               Text(
-                _profileName,
+                _profileName.isNotEmpty ? _profileName : 'Nome',
                 style: TextStyle(
                   fontFamily: 'Inter',
                   color: sunsetDarkPurple,
