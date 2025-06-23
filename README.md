@@ -72,8 +72,6 @@ Saiba mais sobre os ODS: [https://brasil.un.org/pt-br/sdgs](https://brasil.un.or
 
 ## 📸 Capturas de tela
 
-*****
-
 <p float="left">
   <img src="assets/pagina_inicial.jpg" width="200" />
   <img src="assets/timeline.jpg" width="200" />
