@@ -59,7 +59,23 @@ class _TimelineScreenState extends State<TimelineScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: StreamBuilder<QuerySnapshot>(
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              const Color(0xFFE1BEE7), // Mantém o lavanda suave
+              const Color(0xFFFFE0B2),  // Transita para o seu laranja claro na base
+            ],
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+          ),
+          image: DecorationImage(
+            image: AssetImage('assets/mapadefundo.png'),
+            repeat: ImageRepeat.repeat,
+            opacity: 0.05,
+          ),
+        ),
+        child: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance
             .collection('timeline_posts')
             .orderBy('timestamp', descending: true)
@@ -85,7 +101,7 @@ class _TimelineScreenState extends State<TimelineScreen> {
             },
           );
         },
-      ),
+      ),),
     );
   }
 }

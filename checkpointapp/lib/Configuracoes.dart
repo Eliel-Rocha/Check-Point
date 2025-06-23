@@ -124,7 +124,24 @@ class _ConfigPageState extends State<ConfigPage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
-        body: Padding(
+
+        body: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [
+                const Color(0xFFE1BEE7), // Mantém o lavanda suave
+                const Color(0xFFFFE0B2),  // Transita para o seu laranja claro na base
+              ],
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+            ),
+            image: DecorationImage(
+              image: AssetImage('assets/mapadefundo.png'),
+              repeat: ImageRepeat.repeat,
+              opacity: 0.05,
+            ),
+          ),
+          child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Column(
             children: [
@@ -279,7 +296,7 @@ class _ConfigPageState extends State<ConfigPage> {
 
             ],
           ),
-        ),
+        ),),
       ),
     );
   }
