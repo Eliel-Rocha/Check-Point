@@ -176,7 +176,7 @@ class TimelineService {
       'username': nomeUsuario,
       'handle': '@$handleUsuario',
       'userId': user.uid,
-      'caption': 'Acabei de conquistar: $tituloConquista! 🏆',
+      'caption': 'Acabei de conquistar $tituloConquista 🏆',
       'likes': 0,
       'likedBy': [],
       'commentsNum': 0,
