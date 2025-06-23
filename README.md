@@ -93,24 +93,8 @@ Respositorio:.
     │
     ├───assets		// Imagems do aplictivo
     │
-    │       album.png
     │       CheckPoint.png
-    │       Chiquinha.jpg
-    │       circulos.png
-    │       comida-e-restaurante.png
-    │       compartilhar.png
-    │       coracao.png
-    │       documento.png
-    │       fb-icon.png
-    │       fotos.png
-    │       login-icon.png
-    │       mapa-de-viagem.png
-    │       map_marker.png
-    │       medalha.png
-    │       profile-picture.png
-    │       profile-picture2.png
-    │       reset-password-icon.png
-    │       voar.png	
+    │       ...
     │
     ├───lib		// Codigo pricipal do projeto em DART
     │   │
