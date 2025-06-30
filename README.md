@@ -2,6 +2,11 @@
 
 Aplicativo mobile desenvolvido em Flutter para registrar, compartilhar e acompanhar conquistas relacionadas a visitas nos lugares da PUCMINAS. Este projeto foi criado como parte do **Projeto Integrado I - Engenharia de Computação (PUC Minas - Coração Eucarístico)**.
 
+ ### Pré-requisitos
+* [Flutter](https://flutter.dev/docs/get-started/install) (versão Flutter 3.29.0 -> revision 35c388afb5 )
+* Dart 3.7.0
+* DevTools 2.42.2
+* Um emulador Android/iOS ou um dispositivo físico
 ---
 
 ## 📱 Sobre o App
